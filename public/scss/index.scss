@@ -1,0 +1,185 @@
+@import "theming";
+@import "../vendor/bootstrap/scss/bootstrap";
+
+// Homepage
+
+// header
+header {
+  $h: 500px;
+  height: $h;
+  background-color: #3a2449;
+  position: relative;
+
+  h1 {
+    font-size: 50px;
+  }
+
+  .subtitle {
+    font-size: 25px;
+  }
+
+  .img {
+    height: $h;
+    background-image: url(../img/header.jpg);
+    -webkit-background-size: cover;
+    background-size: cover;
+    opacity: .3;
+    position: absolute;
+    width: 100%;
+    background-position: center;
+    z-index: 0;
+  }
+
+  .content {
+    height: $h;
+    width: 100%;
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+  }
+
+  .wave {
+    height: $h;
+    width: 100%;
+    z-index: 2;
+    position: absolute;
+
+    svg {
+      position: absolute;
+      bottom: 0;
+      fill: white;
+      width:100%;
+    }
+  }
+
+  .video {
+    position: absolute;
+    z-index: 4;
+    width: 600px;
+    height: 400px;
+    right: 0;
+    top: 130px;
+    background-color: $gray-900;
+    border-radius: 20px 0 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @include media-breakpoint-down(lg) {
+      width: 500px;
+      height: 350px;
+    }
+
+    @include media-breakpoint-down(md) {
+      top: 200px;
+      width: 400px;
+      height: 300px;
+    }
+
+    @include media-breakpoint-down(sm) {
+      width: 300px;
+      height: 200px;
+      top: 320px;
+    }
+
+    .feather {
+      stroke: white;
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+}
+
+// sections
+.section {
+  $dist: 150px;
+  margin-top: $dist;
+  margin-bottom: $dist;
+
+  h2 {
+    max-width: 400px;
+  }
+}
+
+// bubbles section
+.bubbles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+
+  li {
+    $size: 100px;
+    width: $size;
+    height: $size;
+    list-style: none;
+    border-radius: 100%;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @extend .bg-secondary;
+  }
+
+  img {
+    width: 45px;
+  }
+
+  .size2 {
+    $size: 150px;
+    width: $size;
+    height: $size;
+
+    img {
+      width: 64px;
+    }
+  }
+
+  // french
+  li:nth-child(2) {
+    position: relative;
+    top: 50px;
+    @include media-breakpoint-down(xs) {
+      top: 0;
+    }
+  }
+
+  // english
+  li:nth-child(3) {
+    position: relative;
+    top: 100px;
+  }
+
+  // geo
+  li:nth-child(5) {
+    position: relative;
+    top: 100px;
+  }
+
+  // biology
+  li:nth-child(6) {
+    position: relative;
+    bottom: 30px;
+    @include media-breakpoint-down(md) {
+      top: 100px;
+    }
+
+    @include media-breakpoint-down(xs) {
+      top: 0;
+      right: 100px
+    }
+  }
+
+  // physics/chemistry
+  li:nth-child(7) {
+    position: relative;
+    top: 50px;
+    @include media-breakpoint-down(sm) {
+      right: 100px;
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{% extends 'course/create_layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/form.js') }}"></script>
+{% endblock %}
+
+{% block form_course_content %}
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('video_form', {id_course:course.id}) }}"
+           class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à l'étape précédente
+        </a>
+        <a href="{{ path('quiz_form', {id_course:course.id}) }}"
+           class="btn btn-light">
+            Passer à l'étape suivante
+            <i data-feather="arrow-right"></i>
+        </a>
+    </div>
+
+    {% if course.documents|length > 0 %}
+        {% for i, document in course.documents %}
+            {% include "course/document/_form.html.twig" with {'i': i, 'document': document} %}
+        {% endfor %}
+        {% include "course/document/_form.html.twig" with {'i': course.documents|length, 'hide':true} %}
+    {% else %}
+        {% include "course/document/_form.html.twig" with {'i': 0} %}
+    {% endif %}
+
+    {% if course.documents|length > 0 %}
+        <button id="addForm" type="button" class="btn btn-link btn-lg">
+            <i data-feather="plus"></i>
+            Ajouter un autre document
+        </button>
+    {% endif %}
+
+{% endblock %}

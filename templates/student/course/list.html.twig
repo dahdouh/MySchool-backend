@@ -1,0 +1,29 @@
+{% extends 'student/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+{% endblock %}
+
+{% block title %}Liste de mes cours / Espace étudiant{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('student_index') }}">Espace étudiant</a></li>
+            <li class="breadcrumb-item active">Liste de mes cours</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block student_content %}
+    {% if currentMember.member.subscriptions|filter(subscription => subscription.isActive)|length > 0 %}
+        {% include 'course/_list.html.twig' %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i data-feather="alert-triangle"></i>
+            Vous devez prendre un abonnement pour accéder aux cours de votre choix
+        </div>
+    {% endif %}
+{% endblock %}

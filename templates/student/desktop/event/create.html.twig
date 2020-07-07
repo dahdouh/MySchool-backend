@@ -1,0 +1,105 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %} {{ event ? "Édition" : "Création" }} d'un évènement / Mon bureau{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendor/calendar/css/calendar.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/student/create_event.js') }}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('desktop') }}">Mon bureau</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('desktop_calendar') }}">Mon calendrier</a></li>
+            <li class="breadcrumb-item active">{{ event ? "Édition" : "Création" }} d'un évènement</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center text-dark mb-5">{{ event ? "Édition" : "Création" }} d'un évènement</h1>
+
+    <div class="my-3">
+        <a href="{{ path('desktop_calendar') }}" class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à mon calendrier
+        </a>
+    </div>
+
+    <form method="post"
+            {% if event %}
+                action="{{ path('edit_event_action', {id: event.id}) }}"
+            {% else %}
+                action="{{ path('new_event_action') }}"
+            {% endif %}
+    >
+
+        <div class="form-row my-1">
+            <div class="col-6">
+                <label for="title">Titre</label>
+                <input type="text" value="{{ event ? event.title }}"
+                       class="form-control" id="title" name="title" required>
+            </div>
+            <div class="col-3">
+                <label for="class">Type / Couleur</label>
+                <div>
+                    <select name="class" class="selectpicker" data-width="100%"
+                            id="class" title="Choisissez&hellip;" required>
+                        {% for class in classes %}
+                            <option data-content="<span class='badge {{ class }}'>&nbsp;</span> {{ class }}">
+                                {{ class }}
+                            </option>
+
+                            {% if event and event.hasClass(class) %}
+                                <option value="{{ event.class }}" selected
+                                    data-content="<span class='badge {{ class }}'>&nbsp;</span> {{ class }}">
+                                    {{ class }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-3">
+                <label for="url">
+                    URL
+                    <small class="text-muted">Champ facultatif</small>
+                </label>
+                <input placeholder="Associer un site web ?" type="text" value="{{ event ? event.url }}"
+                       class="form-control" id="url" name="url">
+            </div>
+        </div>
+
+        <div>
+            <label for="content">Description</label>
+            <input type="text" value="{{ event ? event.content }}"
+                   class="form-control" id="content" name="content">
+        </div>
+
+        <div class="form-row my-1">
+            <label for="range_date">Période couverte par l'événement</label>
+            <input type="text"
+                   class="form-control" id="range_date" name="range_date" required>
+
+            <input type="hidden" value="{{ event ? event.startDate|date("d/m/Y H:i") }}"
+                   class="form-control" id="start_date" name="start_date" required>
+            <input type="hidden" value="{{ event ? event.endDate|date("d/m/Y H:i") }}"
+                   class="form-control" id="end_date" name="end_date">
+
+        </div>
+        <div class="text-right my-3">
+            <button class="btn btn-primary" type="submit">
+                {{ event ? "Éditer" : "Créer" }}
+            </button>
+        </div>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+<div class="bg-light" id="sidebar-wrapper">
+    <div class="sticky-top">
+        <div class="sidebar-heading">Navigation</div>
+        <div class="overflow">
+        <div class="list-group list-group-flush">
+            {% if is_granted("ROLE_ADMIN") %}
+
+                <a href="{{ path('admin_member_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Membres</a>
+                <a href="{{ path('admin_course_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Cours</a>
+                <a href="{{ path('admin_forum_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Forums</a>
+                <a href="{{ path('admin_level_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Niveaux</a>
+                <a href="{{ path('admin_subject_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Matières</a>
+                <a href="{{ path('admin_historic') }}"
+                   class="list-group-item list-group-item-action bg-light">Historique</a>
+
+            {% elseif is_granted("ROLE_STUDENT") %}
+
+                <h6 class="list-group-item sideBarTitle">Général</h6>
+                <a href="{{ path('desktop') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon bureau</a>
+                <a href="{{ path('student_profile') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon profil</a>
+                <a href="{{ path('student_subscription_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Mes abonnements</a>
+                <a href="{{ path('student_historic') }}"
+                   class="list-group-item list-group-item-action bg-light">Historique</a>
+                <a href="{{ app.session.get('identityConfirmed') ?
+                    path('student_account') : path('student_account_confirm_identity') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon compte</a>
+
+                {% if currentMember.member.subscriptions|filter(subscription => subscription.isActive)|length > 0 %}
+                    <h6 class="list-group-item sideBarTitle">Cours</h6>
+                    {% for subscription in currentMember.member.subscriptions|filter(subscription =>
+                        subscription.isActive) %}
+
+                        {% for subject in subscription.subjects %}
+                            <a href="{{ path('student_course_list', {subjectId: subject.id}) }}"
+                               class="list-group-item list-group-item-action bg-light">{{ subject.name }}</a>
+                        {% endfor %}
+
+                        <h6 class="list-group-item sideBarTitle">Forums</h6>
+                        {% for forum in forumGetter.getAll %}
+                            {% if subscription.level == forum.level %}
+                                {% for subject in subscription.subjects %}
+                                    <a href="{{ path('student_forum_list', {subjectId: subject.id}) }}"
+                                       class="list-group-item list-group-item-action bg-light">{{ subject.name }}</a>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+
+                    {% endfor %}
+                {% endif %}
+
+            {% elseif is_granted("ROLE_TEACHER") %}
+
+                <h6 class="list-group-item sideBarTitle">Général</h6>
+                <a href="{{ path('teacher_profile') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon profil</a>
+                <a href="{{ path('teacher_course_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Mes cours</a>
+                    <a href="{{ path('teacher_forum_list') }}"
+                       class="list-group-item list-group-item-action bg-light">Forums</a>
+                <a href="{{ path('teacher_historic') }}"
+                   class="list-group-item list-group-item-action bg-light">Historique</a>
+                <a href="{{ app.session.get('identityConfirmed') ?
+                path('teacher_account') : path('teacher_account_confirm_identity') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon compte</a>
+
+            {% elseif is_granted("ROLE_TUTOR") %}
+
+                <h6 class="list-group-item sideBarTitle">Général</h6>
+                <a href="{{ path('tutor_profile') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon profil</a>
+                <a href="{{ path('tutor_subscription_list') }}"
+                   class="list-group-item list-group-item-action bg-light">Abonnements de mes enfants</a>
+                <a href="{{ path('tutor_historic') }}"
+                   class="list-group-item list-group-item-action bg-light">Historique</a>
+                <a href="{{ app.session.get('identityConfirmed') ?
+                path('tutor_account') : path('tutor_account_confirm_identity') }}"
+                   class="list-group-item list-group-item-action bg-light">Mon compte</a>
+
+                {% for student in currentMember.member.students %}
+                    {% for subscription in student.subscriptions|filter(subscription => subscription.isActive) %}
+                        <h6 class="list-group-item sideBarTitle">
+                            Cours de {{ student.firstName }} {{ student.lastName }}
+                        </h6>
+                        {% for subject in subscription.subjects %}
+                            <a href="{{ path('tutor_student_course_list', {subjectId: subject.id}) }}"
+                               class="list-group-item list-group-item-action bg-light">{{ subject.name }}</a>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>

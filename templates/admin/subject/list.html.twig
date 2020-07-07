@@ -1,0 +1,61 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Liste des matières / Espace admnistrateur{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_index') }}">Espace admnistrateur</a></li>
+            <li class="breadcrumb-item">Matières</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block admin_content %}
+
+    <p class="text-right my-1">
+        <a href="{{ path('new_subject_form') }}" class="btn btn-success">
+            <i data-feather="plus"></i>
+            Ajouter une matière
+        </a>
+    </p>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Intitulé</th>
+            <th scope="col">Niveaux</th>
+            <th scope="col" class="text-right">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for subject in subjects %}
+            <tr>
+                <th scope="row" class="align-middle">{{ subject.id }}</th>
+                <td class="align-middle">
+                    {{ subject.name }}
+                </td>
+                <td>
+                    {% for level in subject.levels %}
+                        <span class="badge badge-secondary">{{ level.name }}</span>
+                    {% endfor %}
+                </td>
+                <td class="text-right">
+                    <a href="{{ path('edit_subject_form', {'id': subject.id}) }}" type="button"
+                       class="btn btn-secondary">
+                        <i data-feather="edit"></i>
+                    </a>
+                    <a href="{{ path('delete_subject_action', {'id': subject.id}) }}" type="button"
+                       class="btn btn-danger"
+                       data-alert='Êtes-vous sûr de vouloir supprimer la matière "{{ subject.name }}" ? Cela engendrera la suppression de {{ subject.courses|length }} cours associé{{ subject.courses|length > 1 ? "s" }}'>
+                        <i data-feather="x"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

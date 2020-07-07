@@ -1,0 +1,53 @@
+<form method="post"
+      data-newAction="{{ path('new_quiz_action', {id_course: course.id}) }}"
+        {% if quiz is defined %}
+            action="{{ path('edit_quiz_action', {id_course: course.id, id:quiz.id}) }}"
+            id="quiz{{ quiz.id }}"
+        {% else %}
+            action="{{ path('new_quiz_action', {id_course: course.id}) }}"
+        {% endif %}
+      class="card my-2{{ hide is defined ? ' d-none' }}">
+    <div class="card-header">
+        Quiz #<span class="number">{{ k + 1 }}</span>
+    </div>
+
+    <div class="blockQuestion d-none">
+        <hr class="my-5"/>
+        {% include "course/quiz/_form_question.html.twig" with {'i': 0, "hidden": true} %}
+    </div>
+
+    {% if quiz is defined %}
+        {% for i, question in quiz.questions %}
+            {% if i != 0 %}
+                <hr class="my-5"/>
+            {% endif %}
+            {% include "course/quiz/_form_question.html.twig" with {'i': i, 'question': question} %}
+        {% endfor %}
+    {% else %}
+        {% include "course/quiz/_form_question.html.twig" with {'i': 0} %}
+    {% endif %}
+
+    <div class="card-body">
+        <button type="button" class="btn btn-secondary addQuestion">
+            <i data-feather="plus"></i>
+            Ajouter une autre question
+        </button>
+    </div>
+
+    <div class="card-footer text-right">
+        <button type="submit" class="btn btn-success">
+            <i data-feather="save"></i>
+            Enregistrer le quiz
+        </button>
+        {% if quiz is defined %}
+            <a href="{{ path('delete_quiz_action', {id_course:course.id, id: quiz.id}) }}"
+               class="btn btn-danger delete">
+                <i data-feather="x"></i>
+                Supprimer le quiz
+            </a>
+        {% endif %}
+    </div>
+
+    <input type="hidden" name="deletedQuestionsId">
+    <input type="hidden" name="deletedChoicesId">
+</form>

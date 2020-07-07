@@ -1,0 +1,69 @@
+<form method="post"
+      data-newAction="{{ path('new_video_action', {id_course: course.id}) }}"
+        {% if video is defined %}
+            action="{{ path('edit_video_action', {id_course: course.id, id:video.id}) }}"
+        {% else %}
+            action="{{ path('new_video_action', {id_course: course.id}) }}"
+        {% endif %}
+      enctype="multipart/form-data" class="card my-2{{ hide is defined ? ' d-none' }}">
+    <div class="card-header">
+        Video #<span class="number">{{ i + 1 }}</span>
+    </div>
+    <div class="card-body{{ video is defined and video.file ? ' container' }}">
+        <div{{ video is defined and video.file ? ' class="row"' }}>
+            {% if video is defined and video.file %}
+                <div class="col-sm-4 py-2 align-self-center preview">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video loop controls muted>
+                            <source src="{{ asset(video.file) }}" type="video/{{ video.fileExtension }}" />
+                        </video>
+                    </div>
+                </div> {# end of col #}
+            {% endif %}
+
+            <div class="form{{ video is defined and video.file ? ' col-sm-8' }}">
+                <div class="form-group">
+                    <label for="name{{ i }}">Titre</label>
+                    <input type="text"
+                           class="form-control" name="name"
+                           placeholder="Intitulé de la vidéo"
+                           id="name{{ i }}" value="{{ video is defined ? video.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="description{{ i }}">Description</label>
+                    <textarea class="form-control"
+                              id="description{{ i }}"
+                              rows="5" name="description"
+                              placeholder="Une courte description pour introduire la vidéo"
+                              required>{{ video is defined ? video.description }}</textarea>
+                </div>
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" name="video" accept="video/*"
+                               class="custom-file-input" id="video{{ i }}"{{ not video is defined ? " required" }}>
+                        <label class="custom-file-label" for="video{{ i }}">Choisir un fichier</label>
+                    </div>
+                </div>
+                <div class="invalid-feedback">
+                    Votre fichier a une taille de <span class="size"></span>
+                </div>
+                <small class="form-text text-muted">
+                    La taille maximale d'un fichier est de 2Mo.
+                </small>
+            </div> {# end of col #}
+        </div> {# end of row #}
+    </div> {# card body #}
+    <div class="card-footer text-right">
+        <button type="submit" class="btn btn-success">
+            <i data-feather="save"></i>
+            Enregistrer la vidéo
+        </button>
+        {% if video is defined %}
+            <a href="{{ path('delete_video_action', {id_course:course.id, id: video.id}) }}"
+               class="btn btn-danger delete">
+                <i data-feather="x"></i>
+                Supprimer la vidéo
+            </a>
+        {% endif %}
+    </div>
+</form>

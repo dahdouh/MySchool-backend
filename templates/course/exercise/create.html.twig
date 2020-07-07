@@ -1,0 +1,50 @@
+{% extends 'course/create_layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.20.0/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.20.0/theme/paraiso-dark.css">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-bs4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/form.js') }}"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.20.0/codemirror.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.20.0/mode/xml/xml.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/formatting.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-bs4.min.js"></script>
+    <script type="text/javascript" src="{{ asset('js/course/summernote.js') }}"></script>
+{% endblock %}
+
+{% block form_course_content %}
+    <div class="d-flex justify-content-between">
+        <a href="#"
+           class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à l'étape précédente
+        </a>
+        <a href="{{ path('exam_form', {id_course:course.id}) }}"
+           class="btn btn-light">
+            Passer à l'étape suivante
+            <i data-feather="arrow-right"></i>
+        </a>
+    </div>
+
+    {% if course.exercises|length > 0 %}
+        {% for i, exercise in course.exercises %}
+            {% include "course/exercise/_form.html.twig" with {'i': i, 'exercise': exercise} %}
+        {% endfor %}
+        {% include "course/exercise/_form.html.twig" with {'i': course.exercises|length, 'hide':true} %}
+    {% else %}
+        {% include "course/exercise/_form.html.twig" with {'i': 0} %}
+    {% endif %}
+
+    {% if course.exercises|length > 0 %}
+        <button id="addForm" type="button" class="btn btn-link btn-lg">
+            <i data-feather="plus"></i>
+            Ajouter un autre exercice
+        </button>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'teacher/layout.html.twig' %}
+
+{% block title %}Mon compte / Espace enseignant{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('teacher_index') }}">Espace enseignant</a></li>
+            <li class="breadcrumb-item active">Mon compte</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block teacher_content %}
+    {% include 'member/_account.html.twig' %}
+{% endblock %}

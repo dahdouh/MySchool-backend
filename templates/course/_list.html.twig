@@ -1,0 +1,221 @@
+{% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+    <p class="text-right my-1">
+        <a href="{{ path('new_course_form') }}" class="btn btn-success">
+            <i data-feather="plus"></i>
+            Ajouter un cours
+        </a>
+    </p>
+{% endif %}
+
+<form>
+    <div class="row">
+        {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+            <div class="col">
+                <div class="form-group">
+                    <label for="level"><i data-feather="filter"></i> Filtrer par niveau</label>
+                    <select name="levelId" class="selectpicker form-control" title="Sélectionnez un niveau"
+                            id="level">
+                        {% for level in levels %}
+                            <option value="{{ level.id }}"{{ filters.levelId is defined and
+                            level.id == filters.levelId ? "selected" }}>
+                                {{ level.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+
+        <div id="subjectSelect" class="col-md-6">
+            <div class="col">
+                <div class="form-group">
+                    <label for="subject"><i data-feather="filter"></i> Filtrer par matière</label>
+                    <select name="subjectId" class="selectpicker form-control" title="Sélectionnez une matière"
+                            id="subject">
+                        {% for subject in subjects %}
+                            {% if filters.subjects is defined and filters.subjects|length == 1
+                                and subject.id in filters.subjects %}
+                                <option value="{{ subject.id }}" selected>{{ subject.name }}</option>
+                            {% else %}
+                                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+            <div class="col">
+                <div class="form-group">
+                    <label for="state"><i data-feather="filter"></i> Filtrer par état</label>
+                    <select name="state" class="selectpicker form-control" title="Sélectionnez un état"
+                            id="state">
+                        <option {{ filters.isValid is defined and "valid" == filters.isValid ? "selected" }}
+                                value="valid"
+                                data-content="<span class='badge badge-success'>&nbsp;</span> Validé">
+                            validé
+                        </option>
+                        <option {{ filters.isValid is defined and "invalid" == filters.isValid ? "selected" }}
+                                value="invalid"
+                                data-content="<span class='badge badge-secondary'>&nbsp;</span> Non validé">
+                            non validé
+                        </option>
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="d-flex">
+            <div class="align-self-center" style="position: relative; top: 8px">
+                <button type="submit" class="btn btn-secondary">Ok</button>
+                {% if (filters.isValid is defined and not is_granted("ROLE_STUDENT"))
+                    or (filters.levelId is defined and not is_granted("ROLE_STUDENT"))
+                    or filters.subjects is defined and filters.subjects|length == 1 %}
+                    <a href="{{ path(app.request.get('_route'), {page: app.request.get('page')}) }}"
+                       class="btn btn-danger">
+                        <i data-feather="x"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+
+{% if courses|length == 0 %}
+    <div class="alert alert-warning" role="alert">
+        <i data-feather="alert-triangle"></i>
+        Aucun cours ne correspond à ces critères.
+    </div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        <i data-feather="info"></i>
+        {% if courses|length == 1 %}
+            1 cours a été trouvé
+        {% else %}
+            {{ courses|length }} cours ont été trouvés
+        {% endif %}
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Intitulé</th>
+            <th scope="col">Auteur</th>
+            <th scope="col">Matière</th>
+            <th scope="col">Niveau</th>
+            {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+                <th scope="col">Action</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for course in courses %}
+            <tr>
+                <td class="align-middle">
+                    <h5 class="mb-0">
+                        {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+                            {% if course.isValid %}
+                                <span class="badge badge-success">Validé</span>
+                            {% else %}
+                                <span class="badge badge-light">Non validé</span>
+                            {% endif %}
+                        {% endif %}
+                        <a href="{{ path('show_course', {id: course.id, nav: 'course'}) }}">{{ course.name }}</a>
+                    </h5>
+                    <p class="text-black-50 small">Créé le {{ course.dateCreation|date("d/m/Y") }},
+                        dernière modification le {{ course.dateUpdate|date("d/m/Y") }}</p>
+                    <p>{{ course.description }}</p>
+                    <p>
+                        {% if course.videos|length > 0 %}
+                            <a href="{{ path('show_video', {id_course: course.id, nav: 'video'}) }}"
+                               class="badge badge-secondary">
+                                {{ course.videos|length }} vidéo{{ course.videos|length > 1 ? 's' }}
+                            </a>
+                        {% endif %}
+                        {% if course.documents|length > 0 %}
+                            <a href="{{ path('show_document', {id_course: course.id, nav: 'document'}) }}"
+                               class="badge badge-secondary">
+                                {{ course.documents|length }} document{{ course.documents|length > 1 ? 's' }}
+                            </a>
+                        {% endif %}
+                        {% if course.exercises|length > 0 %}
+                            <a href="{{ path('show_exercise', {id_course: course.id, nav: 'exercise'}) }}"
+                               class="badge badge-secondary">
+                                {{ course.exercises|length }} exercice{{ course.exercises|length > 1 ? 's' }}
+                            </a>
+                        {% endif %}
+                        {% if course.quizzes|length > 0 %}
+                            <a href="{{ path('show_quiz', {id_course: course.id, nav: 'quiz'}) }}"
+                               class="badge badge-secondary">{{ course.quizzes|length }} quiz</a>
+                        {% endif %}
+                        {% if course.exams|length > 0 %}
+                            <a href="{{ path('show_exam', {id_course: course.id, nav: 'exam'}) }}"
+                               class="badge badge-secondary">
+                                {{ course.exams|length }} évaluation{{ course.exams|length > 1 ? 's' }}
+                            </a>
+                        {% endif %}
+                    </p>
+                </td>
+                <td class="align-middle">
+                    <a href="{{ path('member_profile', {id: course.teacher.id}) }}">
+                        {% if course.teacher.hasRole("ROLE_ADMIN") %}
+                            Administrateur
+                        {% else %}
+                            {{ course.teacher.firstname }} {{ course.teacher.lastname }}
+                        {% endif %}
+                    </a>
+                </td>
+                <td class="align-middle">
+                    <span class="badge badge-secondary">{{ course.subject.name }}</span>
+                </td>
+                <td class="align-middle">
+                    <span class="badge badge-secondary">{{ course.level.name }}</span>
+                </td>
+                {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_TEACHER") %}
+                    <td class="align-middle">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle"
+                                    type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <i data-feather="settings"></i> Action
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <h6 class="dropdown-header"><i data-feather="edit-2"></i> Éditer</h6>
+                                <a class="dropdown-item"
+                                   href="{{ path('edit_course_form', {id:course.id}) }}">Le cours</a>
+                                <a class="dropdown-item"
+                                   href="{{ path('video_form', {id_course:course.id}) }}">Les vidéos</a>
+                                <a class="dropdown-item"
+                                   href="{{ path('document_form', {id_course:course.id}) }}">Les documents</a>
+                                <a class="dropdown-item"
+                                   href="{{ path('quiz_form', {id_course:course.id}) }}">Les quiz</a>
+                                <a class="dropdown-item"
+                                   href="{{ path('exercise_form', {id_course:course.id}) }}">Les exercices</a>
+                                <a class="dropdown-item"
+                                   href="{{ path('exam_form', {id_course:course.id}) }}">Les évaluations</a>
+                                {% if not course.isValid and is_granted('ROLE_ADMIN') %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-success"
+                                       href="{{ path('validate_course_action', {id:course.id}) }}"
+                                       data-alert='Êtes-vous sûr de vouloir valider le cours "{{ course.name }}" ?'>
+                                        <i data-feather="check"></i>
+                                        Valider le cours
+                                    </a>
+                                {% endif %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item bg-danger text-white"
+                                   href="{{ path('delete_course_action', {id:course.id}) }}"
+                                   data-alert='Êtes-vous sûr de vouloir supprimer le cours "{{ course.name }}" ?'>
+                                    <i data-feather="x"></i> Supprimer le cours
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% include  "common/_pagination.html.twig" %}

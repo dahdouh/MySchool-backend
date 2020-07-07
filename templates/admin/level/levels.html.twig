@@ -1,0 +1,35 @@
+{% extends 'admin/layout.html.twig' %}
+
+ 
+
+{% block admin_content %}
+
+
+<table class="table table-hover">
+    <tbody>
+    {% for level in levels %}
+        <tr>
+            <th scope="row" class="align-middle">{{ level.id }}</th>
+            <td class="align-middle">
+                {{ level.name }}
+            </td>
+            <td>
+                {% for subject in level.subjects %}
+                <span class="badge badge-secondary">{{ subject.name }}</span>
+                {% endfor %}
+            </td>
+            <td class="text-right">
+                <a href="{{ path('edit_level_form', {'id': level.id}) }}" type="button" class="btn btn-secondary">
+                    <i data-feather="edit"></i>
+                </a>
+                <a href="{{ path('delete_level_action', {'id': level.id}) }}" type="button" class="btn btn-danger"
+                   data-alert='Êtes-vous sûr de vouloir supprimer le niveau "{{ level.name }}" ? Cela engendrera la suppression de {{ level.courses|length }} cours associé{{ level.courses|length > 1 ? "s" }}'>
+                    <i data-feather="x"></i>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

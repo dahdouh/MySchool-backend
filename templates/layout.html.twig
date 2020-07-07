@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+{% block breadcrumbs %}{% endblock %}
+
+
+<main class="container mt-5 section">
+
+{# read and display all flash messages #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}" role="alert">
+
+            {% if label == "success" %}
+                <i data-feather="check"></i>
+            {% elseif label == "danger" %}
+                <i data-feather="x-octagon"></i>
+            {% elseif label == "warning" %}
+                <i data-feather="alert-triangle"></i>
+            {% elseif label == "info" %}
+                <i data-feather="info"></i>
+            {% endif %}
+
+            {{ message|raw }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+{% block content %}
+{% endblock %}
+
+</main>
+
+{% endblock %}

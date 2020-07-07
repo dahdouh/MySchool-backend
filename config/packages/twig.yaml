@@ -1,0 +1,8 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    globals:
+        levelGetter: '@App\Service\LevelGetter'
+        forumGetter: '@App\Service\ForumGetter'
+        currentMember: '@App\Service\CurrentMember'
+        subscription_monthlyRate: "%subscription_monthlyRate%"
+        subscription_subjectPrice: "%subscription_subjectPrice%"

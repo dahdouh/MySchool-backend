@@ -1,0 +1,88 @@
+<div class="wrapperQuestion">
+
+    <div class="blockChoice d-none">
+        {% include "course/quiz/_form_choice.html.twig" with {'i': i, 'j': 0, 'k': k, 'hidden': true} %}
+    </div>
+
+    <div class="card-body">
+        <div class="form">
+            <div class="form-group">
+                <h5 class="card-title">
+                    <label for="question{{ k }}{{ i }}" class="questionLabel">
+                        <i data-feather="help-circle" class="no-width" width="20px"></i>
+                        Question #<span class="number">{{ i + 1 }}</span>
+                    </label>
+                </h5>
+                <div class="input-group mb-3">
+                    <input type="text"
+                           class="form-control" name="questionContent[]"
+                           placeholder="Contenu de la question"
+                           id="question{{ k }}{{ i }}"
+                           value="{{ question is defined ? question.content }}" required>
+                    {% if hidden is defined or (question is defined and i != 0) %}
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-danger deleteQuestion"
+                                {% if question is defined %}
+                                    data-questionId="{{ question.id }}"
+                                    data-quizId="quiz{{ quiz.id }}"
+                                {% endif %}
+                                type="button">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div> {# card body #}
+
+    <div class="card m-4">
+        <ul class="list-group list-group-flush">
+            {% if question is defined %}
+                {% for rightChoice in question.choices|filter(choice => choice.isAnswer) %}
+                <li class="list-group-item">
+                    <div class="form-group">
+                        <label class="text-success" for="rightAnswer{{ k }}{{ i }}">
+                            <i data-feather="check-circle"></i>
+                            Choix de réponse (solution)
+                        </label>
+                        <input type="text"
+                               class="form-control border-success text-success"
+                               name="rightAnswerContent[{{ i }}]"
+                               placeholder="Contenu de la bonne réponse"
+                               id="rightAnswer{{ k }}{{ i }}"
+                               value="{{ rightChoice.content }}" required>
+                    </div>
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-group-item">
+                    <div class="form-group">
+                        <label class="text-success" for="rightAnswer{{ k }}{{ i }}">
+                            <i data-feather="check-circle"></i>
+                            Choix de réponse (solution)
+                        </label>
+                        <input type="text"
+                               class="form-control border-success text-success" name="rightAnswerContent[]"
+                               placeholder="Contenu de la bonne réponse"
+                               id="rightAnswer{{ k }}{{ i }}" required>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if question is defined %}
+                {% for j, choice in question.choices|filter(choice => not choice.isAnswer) %}
+                    {% include "course/quiz/_form_choice.html.twig" with {'i': i, 'j': j, 'k': k, 'choice': choice} %}
+                {% endfor %}
+            {% else %}
+                {% include "course/quiz/_form_choice.html.twig" with {'i': i, 'j': 0,  'k': k} %}
+            {% endif %}
+        </ul>
+        <div class="card-body">
+            <button type="button" class="btn btn-secondary addChoice">
+                <i data-feather="plus"></i>
+                Ajouter un choix de réponse pour la <b>question #<span class="number">{{ i + 1 }}</span></b>
+            </button>
+        </div>
+    </div>
+</div>

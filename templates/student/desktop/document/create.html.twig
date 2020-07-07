@@ -1,0 +1,51 @@
+{% extends 'layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/form.js') }}"></script>
+{% endblock %}
+
+{% block title %}Ajout d'un document / Mon bureau{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('desktop') }}">Mon bureau</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('desktop_document') }}">Mes documents</a></li>
+            <li class="breadcrumb-item active">Ajout d'un document</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center text-dark mb-5">Ajout d'un document</h1>
+
+    <div class="my-3">
+        <a href="{{ path('desktop_document') }}" class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à la liste de mes documents
+        </a>
+    </div>
+
+    {% if member.desktopDocuments|length > 0 %}
+        {% for i, desktopDocument in member.desktopDocuments %}
+            {% include "student/desktop/document/_form.html.twig"
+                with {'i': i, 'document': desktopDocument} %}
+        {% endfor %}
+        {% include "student/desktop/document/_form.html.twig"
+            with {'i': member.desktopDocuments|length, 'hide':true} %}
+    {% else %}
+        {% include "student/desktop/document/_form.html.twig"
+            with {'i': 0} %}
+    {% endif %}
+
+    {% if member.desktopDocuments|length > 0 %}
+        <button id="addForm" type="button" class="btn btn-link btn-lg">
+            <i data-feather="plus"></i>
+            Ajouter un autre document
+        </button>
+    {% endif %}
+
+{% endblock %}

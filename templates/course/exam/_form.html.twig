@@ -1,0 +1,45 @@
+<form method="post"
+      data-newAction="{{ path('new_exam_action', {id_course: course.id}) }}"
+        {% if exam is defined %}
+            action="{{ path('edit_exam_action', {id_course: course.id, id:exam.id}) }}"
+        {% else %}
+            action="{{ path('new_exam_action', {id_course: course.id}) }}"
+        {% endif %}
+      enctype="multipart/form-data" class="card my-2{{ hide is defined ? ' d-none' }}">
+    <div class="card-header">
+        Évaluation #<span class="number">{{ i + 1 }}</span>
+    </div>
+    <div class="card-body">
+        <div>
+            <div class="form">
+                <div class="form-group">
+                    <label for="content{{ i }}">Énoncé</label>
+                    <textarea class="form-control summernote"
+                              placeholder="Rédigez le contenu de l'énoncé pour cette évaluation"
+                              id="content{{ i }}" name="content"
+                              required>{{ exam is defined ? exam.content }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="correction{{ i }}">Correction</label>
+                    <textarea class="form-control summernote"
+                              placeholder="Rédigez le contenu de la correction pour cette évaluation"
+                              id="correction{{ i }}" name="correction"
+                              required>{{ exam is defined ? exam.correction }}</textarea>
+                </div>
+            </div> {# end of col #}
+        </div> {# end of row #}
+    </div> {# card body #}
+    <div class="card-footer text-right">
+        <button type="submit" class="btn btn-success">
+            <i data-feather="save"></i>
+            Enregistrer l'évaluation
+        </button>
+        {% if exam is defined %}
+            <a href="{{ path('delete_exam_action', {id_course:course.id, id: exam.id}) }}"
+               class="btn btn-danger delete">
+                <i data-feather="x"></i>
+                Supprimer l'évaluation
+            </a>
+        {% endif %}
+    </div>
+</form>

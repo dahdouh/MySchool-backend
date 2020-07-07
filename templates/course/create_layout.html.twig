@@ -1,0 +1,120 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ course ? "Édition" : "Proposition" }} d'un cours / Espace professeur{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            {% if is_granted('ROLE_ADMIN') %}
+            <li class="breadcrumb-item"><a href="{{ path('admin_index') }}">Espace administrateur</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_course_list') }}">Cours</a></li>
+            {% elseif is_granted('ROLE_TEACHER') %}
+            <li class="breadcrumb-item"><a href="{{ path('teacher_index') }}">Espace professeur</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('teacher_course_list') }}">Cours</a></li>
+            {% elseif is_granted('ROLE_STUDENT') %}
+            {# TODO: links in course breadcrumbs for students #}
+            <li class="breadcrumb-item"><a href="#">Espace étudiant</a></li>
+            <li class="breadcrumb-item"><a href="#">Cours</a></li>
+            {% else %}
+            {# TODO: links in course breadcrumbs for visitors #}
+            <li class="breadcrumb-item"><a href="#">Cours</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">
+            {% if course %}
+                Édition du cours : <b>{{ course.name }}</b>
+            {% else %}
+                Proposition d'un cours
+            {% endif %}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center text-dark">Proposition d'un cours</h1>
+
+    <ul class="progress-tracker progress-tracker--text progress-tracker--center">
+        <li class="progress-step {{ step == 1 ? "is-active" : "is-complete" }}">
+            {% if step != 1 and course %}
+            <a href="{{ path('edit_course_form', {id:course.id}) }}">
+                <div class="progress-marker"></div>
+            </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 1</h4>
+                Rédaction du cours
+            </div>
+        </li>
+        <li class="progress-step{% if step == 2 %} is-active{% elseif step > 2 %} is-complete{% endif %}">
+            {% if step != 2 and course %}
+                <a href="{{ path('video_form', {id_course:course.id}) }}">
+                    <div class="progress-marker"></div>
+                </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 2</h4>
+                Ajout de vidéos
+            </div>
+        </li>
+        <li class="progress-step{% if step == 3 %} is-active{% elseif step > 3 %} is-complete{% endif %}">
+            {% if step != 3 and course %}
+                <a href="{{ path('document_form', {id_course:course.id}) }}">
+                    <div class="progress-marker"></div>
+                </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 3</h4>
+                Ajout de documents
+            </div>
+        </li>
+        <li class="progress-step{% if step == 4 %} is-active{% elseif step > 4 %} is-complete{% endif %}">
+            {% if step != 4 and course %}
+                <a href="{{ path('quiz_form', {id_course:course.id}) }}">
+                    <div class="progress-marker"></div>
+                </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 4</h4>
+                Ajout de quiz
+            </div>
+        </li>
+        <li class="progress-step{% if step == 5 %} is-active{% elseif step > 5 %} is-complete{% endif %}">
+            {% if step != 5 and course %}
+                <a href="{{ path('exercise_form', {id_course:course.id}) }}">
+                    <div class="progress-marker"></div>
+                </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 5</h4>
+                Ajout d'exercices
+            </div>
+        </li>
+        <li class="progress-step{{ step == 6 ? " is-active" }}">
+            {% if step != 6 and course %}
+                <a href="{{ path('exam_form', {id_course:course.id}) }}">
+                    <div class="progress-marker"></div>
+                </a>
+            {% else %}
+                <div class="progress-marker"></div>
+            {% endif %}
+            <div class="progress-text">
+                <h4 class="progress-title">Étape 6</h4>
+                Ajout d'évaluations
+            </div>
+        </li>
+    </ul>
+
+    {% block form_course_content %}
+    {% endblock %}
+{% endblock %}

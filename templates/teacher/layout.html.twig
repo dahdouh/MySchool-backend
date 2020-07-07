@@ -1,0 +1,47 @@
+{% extends 'layout.html.twig' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">Espace enseignant</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Espace enseignant</h1>
+        <p class="lead">Bienvenue sur votre espace enseignant,
+            <strong>{{ currentMember.member.firstName }} {{ currentMember.member.lastName }}</strong></p>
+    </div>
+
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'profile' ? ' active' }}"
+               href="{{ path('teacher_profile') }}">Mon profil</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'forum' ? ' active' }}"
+               href="{{ path('teacher_forum_list') }}">Forums</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'course' ? ' active' }}"
+               href="{{ path('teacher_course_list') }}">Mes cours</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'account' ? ' active' }}"
+               href="{{ app.session.get('identityConfirmed') ?
+               path('teacher_account') : path('teacher_account_confirm_identity') }}">Mon compte</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'historic' ? ' active' }}"
+               href="{{ path('teacher_historic') }}">Mon historique</a>
+        </li>
+    </ul>
+
+    <div class="py-3">
+        {% block teacher_content %}{% endblock %}
+    </div>
+{% endblock %}

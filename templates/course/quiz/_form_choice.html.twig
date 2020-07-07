@@ -1,0 +1,25 @@
+<li class="list-group-item blockChoice">
+    <div class="form-group">
+        <label for="choice{{ k }}{{ i }}{{ j }}" class="choiceLabel">
+            Choix de réponse
+        </label>
+        <div class="input-group mb-3">
+            <input type="text"
+                   class="form-control" name="choice[{{ i }}][]"
+                   placeholder="Contenu du choix de réponse"
+                   id="choice{{ k }}{{ i }}{{ j }}" value="{{ choice is defined ? choice.content }}" required>
+            {% if hidden is defined or (question is defined and j != 1 and j != 0) %}
+                <div class="input-group-append">
+                    <button class="btn btn-outline-danger deleteChoice"
+                            {% if choice is defined %}
+                                data-choiceId="{{ choice.id }}"
+                                data-quizId="quiz{{ quiz.id }}"
+                            {% endif %}
+                            type="button">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</li>

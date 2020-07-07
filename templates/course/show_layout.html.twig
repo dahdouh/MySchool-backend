@@ -1,0 +1,72 @@
+{% extends 'layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/show.js') }}"></script>
+{% endblock %}
+
+{% block title %}{{ course.name }} / {{ course.subject.name }} / {{ course.level.name }}{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            {% if is_granted("ROLE_ADMIN") %}
+                <li class="breadcrumb-item"><a href="{{ path('admin_index') }}">Espace administrateur</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('admin_course_list') }}">Cours</a></li>
+            {% elseif is_granted("ROLE_STUDENT") %}
+                <li class="breadcrumb-item"><a href="{{ path('student_index') }}">Espace étudiant</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('student_course_list') }}">Liste de mes cours</a></li>
+            {% elseif is_granted("ROLE_TUTOR") %}
+                <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Espace parent</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('tutor_course_list') }}">Liste des cours de mes enfants</a>
+                </li>
+            {% elseif is_granted("ROLE_TEACHER") %}
+                <li class="breadcrumb-item"><a href="{{ path('teacher_index') }}">Espace enseignant</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('teacher_course_list') }}">Liste de mes cours</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ course.name }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-dark text-center my-5">{{ course.name }}</h1>
+
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link{{ nav == 'course' ? ' active' }}"
+               href="{{ path('show_course', {id: course.id}) }}">Cours</a>
+
+            {% if course.videos|length > 0 %}
+                <a class="nav-item nav-link{{ nav == 'video' ? ' active' }}"
+                   href="{{ path('show_video', {id_course: course.id}) }}">Vidéos</a>
+            {% endif %}
+
+            {% if course.documents|length > 0 %}
+                <a class="nav-item nav-link{{ nav == 'document' ? ' active' }}"
+                   href="{{ path('show_document', {id_course: course.id}) }}">Documents</a>
+            {% endif %}
+
+            {% if course.quizzes|length > 0 %}
+                <a class="nav-item nav-link{{ nav == 'quiz' ? ' active' }}"
+                   href="{{ path('show_quiz', {id_course: course.id}) }}">Quiz</a>
+            {% endif %}
+
+            {% if course.exercises|length > 0 %}
+                <a class="nav-item nav-link{{ nav == 'exercise' ? ' active' }}"
+                   href="{{ path('show_exercise', {id_course: course.id}) }}">Exercices</a>
+            {% endif %}
+
+            {% if course.exams|length > 0 %}
+                <a class="nav-item nav-link{{ nav == 'exam' ? ' active' }}"
+                   href="{{ path('show_exam', {id_course: course.id}) }}">Évaluation</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="my-5">
+        {% block course_content %}{% endblock %}
+    </div>
+{% endblock %}

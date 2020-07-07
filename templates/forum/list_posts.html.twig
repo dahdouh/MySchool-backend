@@ -1,0 +1,156 @@
+{% extends 'layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/css/forum.css"/>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href={{ path('index') }}>Accueil</a></li>
+            {% if is_granted("ROLE_ADMIN") %}
+                <li class="breadcrumb-item"><a href={{ path('admin_index') }}>Espace administrateur</a></li>
+                <li class="breadcrumb-item"><a href={{ path('admin_forum_list') }}>Forum</a></li>
+            {% elseif is_granted("ROLE_TEACHER") %}
+                <li class="breadcrumb-item"><a href={{ path('teacher_index') }}>Espace enseignant</a></li>
+                <li class="breadcrumb-item"><a href={{ path('teacher_forum_list') }}>Forum</a></li>
+            {% else %}
+                <li class="breadcrumb-item"><a href={{ path('student_index') }}>Espace étudiant</a></li>
+                <li class="breadcrumb-item"><a href={{ path('student_forum_list') }}>Forum</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ topic.title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %} {{ topic.forum.level.name }} {% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center text-dark font-weight-light">{{ topic.title }}</h1>
+
+    <div>
+        <a href="{% if is_granted("ROLE_ADMIN") %}
+            {{ path('admin_forum_list') }}
+        {% elseif is_granted("ROLE_TEACHER") %}
+            {{ path('teacher_forum_list') }}
+        {% else %}
+            {{ path('student_forum_list') }}
+        {% endif %}"
+           class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retour à la liste des sujets
+        </a>
+    </div>
+
+    <article class="card bg-light border-secondary mb-5 mt-3">
+        <footer class="card-header d-flex align-items-center">
+            <a href="{{ path('member_profile', {id: topic.author.id}) }}">
+                <div style="width: 40px;" class="img-thumbnail rounded-circle mr-3">
+                    <svg data-jdenticon-value="{{ topic.author.email }}" class="img rounded-circle"></svg>
+                </div>
+            </a>
+            <div>
+                Sujet créé par
+                {% if topic.author.hasRole("ROLE_TUTOR") %}
+                    <span class="badge badge-tutor">Parent</span>
+                {% elseif topic.author.hasRole("ROLE_STUDENT") %}
+                    <span class="badge badge-student">Étudiant</span>
+                {% elseif topic.author.hasRole("ROLE_TEACHER") %}
+                    <span class="badge badge-teacher">Enseignant</span>
+                {% elseif topic.author.hasRole("ROLE_ADMIN") %}
+                    <span class="badge badge-primary">Admin</span>
+                {% endif %}
+                <a href="{{ path('member_profile', {id: topic.author.id}) }}">
+                    {% if topic.author.hasRole("ROLE_ADMIN") %}
+                        Administrateur
+                    {% else %}
+                        {{ topic.author.firstName }}
+                    {% endif %}
+                </a>
+                le {{ topic.date|date("d/m/Y à H:i") }}
+            </div>
+            {% if is_granted('ROLE_ADMIN') or (
+                (is_granted("ROLE_STUDENT") or is_granted("ROLE_TEACHER"))
+                    and currentMember.member == topic.author
+                ) %}
+                <div class="position-absolute" style="right: 10px;">
+                    <a class="btn btn-danger"
+                       data-alert="Êtes-vous sûr de vouloir supprimer définitivement ce sujet ?"
+                       href="{{ path('delete_topic_action', {id: topic.id}) }}">
+                        <i data-feather="x"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </footer>
+        <div class="card-body">
+            <p class="card-text">{{ topic.content }}</p>
+        </div>
+    </article>
+
+    {% include  "common/_pagination.html.twig" %}
+
+    {% for post in posts %}
+        <article class="card mb-3">
+            <footer class="card-header d-flex align-items-center position-relative">
+                <a href="{{ path('member_profile', {id: post.author.id}) }}">
+                    <div style="width: 40px;" class="img-thumbnail rounded-circle mr-3">
+                        <svg data-jdenticon-value="{{ post.author.email }}" class="img rounded-circle"></svg>
+                    </div>
+                </a>
+                <div>
+                    Réponse de
+                    {% if post.author.hasRole("ROLE_TUTOR") %}
+                        <span class="badge badge-tutor">Parent</span>
+                    {% elseif post.author.hasRole("ROLE_STUDENT") %}
+                        <span class="badge badge-student">Étudiant</span>
+                    {% elseif post.author.hasRole("ROLE_TEACHER") %}
+                        <span class="badge badge-teacher">Enseignant</span>
+                    {% elseif post.author.hasRole("ROLE_ADMIN") %}
+                        <span class="badge badge-primary">Admin</span>
+                    {% endif %}
+                    <a href="{{ path('member_profile', {id: post.author.id}) }}">
+                        {% if post.author.hasRole("ROLE_ADMIN") %}
+                            Administrateur
+                        {% else %}
+                            {{ post.author.firstName }}
+                        {% endif %}
+                    </a>
+                    le {{ post.date|date("d/m/Y à H:i") }}
+                </div>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="position-absolute" style="right: 10px;">
+                        <a class="btn btn-danger"
+                           data-alert="Êtes-vous sûr de vouloir supprimer définitivement ce post ?"
+                           href="{{ path('delete_post_action', {"id": post.id}) }}">
+                            <i data-feather="x"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </footer>
+            <div class="card-body">
+                <p class="card-text">{{ post.content }}</p>
+            </div>
+        </article>
+    {% endfor %}
+
+    {% include  "common/_pagination.html.twig" %}
+
+    {# To answer #}
+
+    <form method="post" action="{{ path('new_post_action', {'id': topic.id }) }}">
+
+        <div class="form-group">
+            <label for="contentPost">Votre réponse</label>
+            <textarea name="contentPost" class="form-control" id="contentPost" rows="10"></textarea>
+        </div>
+
+        <div class="text-right my-3">
+            <button class="btn btn-primary" type="submit">
+                Poster
+            </button>
+        </div>
+    </form>
+
+{% endblock %}

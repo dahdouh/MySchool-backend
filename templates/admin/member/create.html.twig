@@ -1,0 +1,82 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ member ? "Édition" : "Création" }} d'un membre / Espace admnistrateur{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active"><a href="{{ path('admin_index') }}">Espace admnistrateur</a></li>
+            <li class="breadcrumb-item active"><a href="{{ path('admin_member_list') }}">Membres</a></li>
+            <li class="breadcrumb-item active">{{ member ? "Édition" : "Création" }} d'un membre</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center text-dark">{{ member ? "Édition" : "Création" }} d'un membre</h1>
+
+    <form method="post"
+          {% if member %}
+          action="{{ path('edit_member_action', {id: member.id}) }}"
+          {% else %}
+          action="{{ path('new_member_action') }}"
+          {% endif %}
+    >
+        <div class="form-row mb-3">
+            <div class="col-6">
+                <label for="lastName">Nom</label>
+                <input type="text" value="{{ member ? member.lastName }}"
+                       class="form-control" id="lastName" name="lastName" required>
+            </div>
+            <div class="col-6">
+                <label for="firstName">Prénom</label>
+                <input type="text" value="{{ member ? member.firstName }}"
+                       class="form-control" id="firstName" name="firstName" required>
+            </div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="email">Email</label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">@</div>
+                    </div>
+                    <input type="email" value="{{ member ? member.email }}"
+                           name="email" id="email" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="registerBirthDate">Date de naissance</label>
+                <input type="text" class="form-control"
+                       id="registerBirthDate" required>
+                <input type="hidden" name="date_birth" id="registerHiddenBirthDate"
+                       value="{{ member ? member.dateBirth|date('Y-m-d') }}">
+            </div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="role">Rôle</label>
+                <select name="role" class="selectpicker form-control"
+                        data-width="100%"
+                        title="Sélectionnez un rôle"
+                        id="role" required>
+                    {% for role in roles %}
+                        {% if member and member.hasRole(role.code) %}
+                            <option value="{{ role.code }}" selected>{{ role.name }}</option>
+                        {% else %}
+                            <option value="{{ role.code }}">{{ role.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="text-right my-3">
+            <button class="btn btn-primary" type="submit">
+                {{ member ? "Éditer" : "Créer" }}
+            </button>
+        </div>
+    </form>
+{% endblock %}

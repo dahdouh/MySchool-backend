@@ -1,0 +1,47 @@
+{% extends 'layout.html.twig' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">Espace parent</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Espace parent</h1>
+        <p class="lead">Bienvenue sur votre espace parent,
+            <strong>{{ currentMember.member.firstName }} {{ currentMember.member.lastName }}</strong></p>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'profile' ? ' active' }}"
+               href="{{ path('tutor_profile') }}">Mon profil</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'course' ? ' active' }}"
+               href="{{ path('tutor_student_course_list') }}">Cours des mes enfants</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'subscription' ? ' active' }}"
+               href="{{ path('tutor_subscription_list') }}">Abonnements de mes enfants</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'account' ? ' active' }}"
+               href="{{ app.session.get('identityConfirmed') ?
+               path('tutor_account') : path('tutor_account_confirm_identity') }}">Mon compte</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'historic' ? ' active' }}"
+               href="{{ path('tutor_historic') }}">Mon historique</a>
+        </li>
+    </ul>
+
+    <div class="py-3">
+        {% block tutor_content %}{% endblock %}
+    </div>
+
+{% endblock %}

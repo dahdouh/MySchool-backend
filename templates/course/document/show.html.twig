@@ -1,0 +1,40 @@
+{% extends 'course/show_layout.html.twig' %}
+
+{% block course_content %}
+{% if course.documents|length > 0 %}
+    <div class="card-columns">
+        {% for document in course.documents %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">{{ document.name }}</h5>
+                </div>
+
+                {% if document.file %}
+                    <a href="{{ asset(document.file) }}" target="_blank"
+                       class="card-img-top text-center bg-light py-5 d-block">
+                        {% set documentIcon = "" %}
+                        {% if document.fileExtension in ["pdf", "txt", "odt", "md", "rtf", "csv"] %}
+                            {% set documentIcon = "file-text" %}
+                        {% elseif document.fileExtension in ["png", "svg", "gif", "jpeg", "jpg"] %}
+                            {% set documentIcon = "image" %}
+                        {% endif %}
+                        <i data-feather="{{ documentIcon }}"
+                           class="no-width" width="100" height="100" stroke-width="1"></i>
+                        <br/>Consulter le document
+                    </a>
+                {% else %}
+                    <div class="card-img-top text-center bg-light py-5">
+                        <i data-feather="frown"
+                           class="no-width" width="100" height="100" stroke-width="1"></i>
+                        <br/>Impossible de récupérer ce document
+                    </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <p class="card-text">{{ document.description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

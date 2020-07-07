@@ -1,0 +1,75 @@
+{% extends 'student/desktop/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendor/calendar/css/calendar.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('vendor/calendar/components/underscore/underscore-min.js') }}"></script>
+    <script src="{{ asset('vendor/calendar/components/jstimezonedetect/jstz.min.js') }}"></script>
+    <script src="{{ asset('vendor/calendar/js/language/fr-FR.js') }}"></script>
+    <script src="{{ asset('vendor/calendar/js/calendar.js') }}"></script>
+    <script src="{{ asset('js/student/calendar.js') }}"></script>
+{% endblock %}
+
+{% block title %}Mon calendrier / Mon bureau{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('desktop') }}">Mon bureau</a></li>
+            <li class="breadcrumb-item active">Mon calendrier</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block desktop_content %}
+    <section id="calendarSection" class="my-3">
+        <div class="text-right my-3">
+            <a class="btn btn-success" href="{{ path('new_event_form') }}"><i data-feather="plus"></i>
+                Ajouter un evènement
+            </a>
+        </div>
+
+        <p id="events_source" class="d-none">{{ path("calendar_get_events") }}</p>
+        <p id="tmpl_path" class="d-none">{{ asset('vendor/calendar/tmpls/') }}</p>
+
+        <div class="d-flex justify-content-between mt-3 p-5 bg-light">
+            <div class="btn-group">
+                <button class="btn btn-secondary" data-calendar-nav="prev"><i data-feather="arrow-left"></i></button>
+                <button class="btn btn-light" data-calendar-nav="today">Aujourd'hui</button>
+                <button class="btn btn-secondary" data-calendar-nav="next"><i data-feather="arrow-right"></i></button>
+            </div>
+
+            <h3 class="currentSelection">Septembre</h3>
+            <div class="btn-group">
+                <button class="btn btn-primary" data-calendar-view="year">Année</button>
+                <button class="btn btn-primary active" data-calendar-view="month">Mois</button>
+                <button class="btn btn-primary" data-calendar-view="week">Semaine</button>
+            </div>
+        </div>
+
+        <div>
+            <div id="calendar"></div>
+        </div>
+
+        <div class="modal fade" id="events-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Event</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+{% endblock %}

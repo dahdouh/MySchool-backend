@@ -1,0 +1,19 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Profil de {{ member.firstName }} {{ member.lastName }}{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">
+                Profil de {{ member.firstName }} {{ member.lastName }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center text-dark mb-5">Page de profil</h1>
+    {% include "member/_profile.html.twig" %}
+{% endblock %}

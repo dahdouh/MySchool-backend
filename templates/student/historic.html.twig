@@ -1,0 +1,17 @@
+{% extends 'student/layout.html.twig' %}
+
+{% block title %}Mon historique / Espace étudiant{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('student_index') }}">Espace étudiant</a></li>
+            <li class="breadcrumb-item">Mon historique</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block student_content %}
+    {% include "historic/_list.html.twig" %}
+{% endblock %}

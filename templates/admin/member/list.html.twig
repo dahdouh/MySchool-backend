@@ -1,0 +1,145 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Liste des membres / Espace admnistrateur{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_index') }}">Espace admnistrateur</a></li>
+            <li class="breadcrumb-item">Membres</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block admin_content %}
+<div class="text-right my-1">
+    <a href="{{ path('new_member_form') }}" class="btn btn-success">
+        <i data-feather="plus"></i>
+        Ajouter un membre
+    </a>
+</div>
+
+<form>
+    <div class="row">
+        <div class="col">
+        <div class="form-group">
+            <label for="role"><i data-feather="filter"></i> Filtrer par rôle</label>
+            <select name="roles[]" class="selectpicker form-control" id="role"
+                    title="Sélectionnez des rôles" multiple>
+                {% for role in roles %}
+                    <option value="{{ role['code'] }}"
+                            {{ (filters.roles is defined and (role.code in filters.roles)) ? "selected" }}
+                            data-content="<span class='badge {{ role['badge'] }}'>&nbsp;</span> {{ role['name'] }}">
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        </div>
+
+        <div class="col">
+        <div class="form-group">
+            <label for="state"><i data-feather="filter"></i> Filtrer par état</label>
+            <select name="states[]" class="selectpicker form-control" id="state"
+                    title="Sélectionnez des états" multiple>
+                <option {{ filters.isActive is defined and filters.isActive ? "selected" }}
+                        value="active"
+                        data-content="<span class='badge badge-success'>&nbsp;</span> Actif">
+                    active
+                </option>
+                <option {{ filters.isActive is defined and not filters.isActive ? "selected" }}
+                        value="inactive"
+                        data-content="<span class='badge badge-secondary'>&nbsp;</span> Inactif">
+                    inactive
+                </option>
+            </select>
+        </div>
+        </div>
+
+        <div class="d-flex">
+            <div class="align-self-center" style="position: relative; top: 8px">
+                <button type="submit" class="btn btn-secondary">Ok</button>
+                {% if filters %}
+                    <a href="{{ path(app.request.get('_route'), {page: app.request.get('page')}) }}"
+                       class="btn btn-danger">
+                        <i data-feather="x"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+
+{% if members|length == 0 %}
+<div class="alert alert-warning" role="alert">
+    <i data-feather="alert-triangle"></i>
+    Aucun membre ne correspond à ces critères.
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    <i data-feather="info"></i>
+    {% if members|length == 1 %}
+        1 membre a été trouvé
+    {% else %}
+        {{ members|length }} membres ont été trouvés
+    {% endif %}
+</div>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Email</th>
+        <th scope="col">Nom</th>
+        <th scope="col">Prénom</th>
+        <th scope="col">Rôle</th>
+        <th scope="col">Profile</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for member in members %}
+    <tr{{ not member.isActive ? ' class="disabled"' }}>
+        <th scope="row">{{ member.id }}</th>
+        <td>{{ member.email }}</td>
+        <td>{{ member.lastName }}</td>
+        <td>{{ member.firstName }}</td>
+        <td>
+            {% if member.hasRole("ROLE_TUTOR") %}
+                <span class="badge badge-tutor">Parent</span>
+            {% elseif member.hasRole("ROLE_STUDENT") %}
+                <span class="badge badge-student">Étudiant</span>
+            {% elseif member.hasRole("ROLE_TEACHER") %}
+                <span class="badge badge-teacher">Enseignant</span>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ path('member_profile', {id: member.id}) }}"
+               class="btn btn-secondary{{ not member.isActive ? ' disabled"' }}">
+                <i data-feather="search"></i>
+                Consulter
+            </a>
+        </td>
+        <td>
+            {% if member.isActive %}
+            <a href="{{ path('edit_member_form', {'id': member.id}) }}" type="button" class="btn btn-secondary">
+                <i data-feather="edit"></i>
+            </a>
+            <a href="{{ path('deactivate_member_action', {'id': member.id}) }}" type="button" class="btn btn-danger"
+               data-alert="Êtes-vous sûr de vouloir désactiver le compte de {{ member.email }} ?">
+                <i data-feather="x"></i>
+            </a>
+            {% else %}
+            <a href="{{ path('activate_member_action', {'id': member.id}) }}" type="button" class="btn btn-success"
+               data-alert="Êtes-vous sûr de vouloir réactiver le compte de {{ member.email }} ?">
+                <i data-feather="rotate-ccw"></i> Activer
+            </a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% include  "common/_pagination.html.twig" %}
+{% endblock %}

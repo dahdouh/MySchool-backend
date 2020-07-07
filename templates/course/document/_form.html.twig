@@ -1,0 +1,75 @@
+<form method="post"
+      data-newAction="{{ path('new_document_action', {id_course: course.id}) }}"
+        {% if document is defined %}
+            action="{{ path('edit_document_action', {id_course: course.id, id:document.id}) }}"
+        {% else %}
+            action="{{ path('new_document_action', {id_course: course.id}) }}"
+        {% endif %}
+      enctype="multipart/form-data" class="card my-2{{ hide is defined ? ' d-none' }}">
+    <div class="card-header">
+        Document #<span class="number">{{ i + 1 }}</span>
+    </div>
+    <div class="card-body{{ document is defined and document.file ? ' container' }}">
+        <div{{ document is defined and document.file ? ' class="row"' }}>
+            {% if document is defined and document.file %}
+                <div class="col-sm-4 py-2 align-self-center text-center preview">
+                    {% set documentIcon = "" %}
+                    {% if document.fileExtension in ["pdf", "txt", "odt", "md", "rtf", "csv"] %}
+                        {% set documentIcon = "file-text" %}
+                    {% elseif document.fileExtension in ["png", "svg", "gif", "jpeg", "jpg"] %}
+                        {% set documentIcon = "image" %}
+                    {% endif %}
+                    <a href="{{ asset(document.file) }}" target="_blank">
+                        <i data-feather="{{ documentIcon }}"
+                           class="no-width" width="100" height="100" stroke-width="1"></i>
+                        <br/>Consulter le document
+                    </a>
+                </div> {# end of col #}
+            {% endif %}
+
+            <div class="form{{ document is defined and document.file ? ' col-sm-8' }}">
+                <div class="form-group">
+                    <label for="name{{ i }}">Titre</label>
+                    <input type="text"
+                           class="form-control" name="name"
+                           placeholder="Intitulé du document"
+                           id="name{{ i }}" value="{{ document is defined ? document.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="description{{ i }}">Description</label>
+                    <textarea class="form-control"
+                              id="description{{ i }}"
+                              rows="5" name="description"
+                              placeholder="Une courte description pour introduire le document"
+                              required>{{ document is defined ? document.description }}</textarea>
+                </div>
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" name="document" accept="image/*, .pdf, .odt, .txt, .md, .csv, .rtf"
+                               class="custom-file-input" id="doc{{ i }}"{{ not document is defined ? " required" }}>
+                        <label class="custom-file-label" for="doc{{ i }}">Choisir un fichier</label>
+                    </div>
+                </div>
+                <div class="invalid-feedback">
+                    Votre fichier a une taille de <span class="size"></span>
+                </div>
+                <small class="form-text text-muted">
+                    La taille maximale d'un fichier est de 2Mo.
+                </small>
+            </div> {# end of col #}
+        </div> {# end of row #}
+    </div> {# card body #}
+    <div class="card-footer text-right">
+        <button type="submit" class="btn btn-success">
+            <i data-feather="save"></i>
+            Enregistrer le document
+        </button>
+        {% if document is defined %}
+            <a href="{{ path('delete_document_action', {id_course:course.id, id: document.id}) }}"
+               class="btn btn-danger delete">
+                <i data-feather="x"></i>
+                Supprimer le document
+            </a>
+        {% endif %}
+    </div>
+</form>

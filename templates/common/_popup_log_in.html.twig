@@ -1,0 +1,70 @@
+<div class="modal fade{{ registration is defined or loginError is defined ? " show" }}"
+     id="logInModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="logInModal-title"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logInModal-title">
+                    <i data-feather="log-in"></i> Se connecter
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                {% if registration is defined %}
+                    <div class="alert alert-success" role="alert">
+                        <i data-feather="check"></i>
+                        Votre inscription s'est effectuée avec succès, vous pouvez désormais entrer vos identifiants
+                        pour accéder à votre compte.
+                    </div>
+                {% endif %}
+
+                {% if loginError is defined %}
+                    <div class="alert alert-danger" role="alert">
+                        <i data-feather="x-octagon"></i>
+                        Les identifiants entrés sont incorrects.
+                    </div>
+                {% endif %}
+
+                <form method="post" action="/login">
+                    <div class="form-group">
+                        <label for="logInEmail">Adresse email</label>
+                        <input type="email" name="email" class="form-control" id="logInEmail"
+                               value="{{ lastUsername is defined ? lastUsername }}" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="logInPassword">Mot de passe</label>
+                        <input type="password" name="password" class="form-control" id="logInPassword" required>
+{#                        <small>#}
+{#                            <a class="form-text text-muted" href="#">Mot de passe oublié ?</a>#}
+{#                        </small>#}
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="logInRemember" name="_remember_me">
+                        <label class="custom-control-label" for="logInRemember">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+                    <p class="text-center mt-3 pt-3">
+                        <button type="submit" class="btn btn-primary">Se connecter</button>
+                    </p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <small class="form-text text-muted text-right">Pas encore inscrit ?
+                    <button class="btn btn-light"
+                            data-toggle="modal"
+                            data-target="#registerModal">S'inscrire</button>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

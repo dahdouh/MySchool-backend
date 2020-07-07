@@ -1,0 +1,102 @@
+@import "theming";
+@import "../vendor/bootstrap/scss/bootstrap";
+
+@import "progress-tracker/main";
+
+@import "sidebar";
+
+body {
+  overflow-x: hidden;
+}
+
+// footer
+#mainFooter {
+  color: white;
+
+  h3 {
+    margin: 30px 0;
+  }
+
+  ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  li {
+    padding-left: 1em;
+    text-indent: -1em;
+
+    &:before {
+      content: "\2014";
+      padding-right: 5px;
+    }
+  }
+
+  a {
+    @extend .text-light;
+  }
+
+  svg {
+    fill: theme-color("primary");
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: theme-color("primary");
+  }
+
+}
+
+// register popup
+#registerModal {
+  .step-two {
+    display: none;
+  }
+}
+
+// pagination
+.pagination {
+  li {
+    display: flex;
+    align-items: stretch;
+  }
+}
+
+// All icons in body
+main svg.feather:not(.no-width) {
+  width: 15px;
+}
+
+// badges
+.badge-tutor {
+  background-color: #AD5D4E;
+  color: $light;
+}
+.badge-teacher {
+  background-color: #543469;
+  color: $light;
+}
+.badge-student {
+  background-color: #8FA884;
+  color: $light;
+}
+
+// disabled styles in table
+.table .disabled, .table .disabled:hover {
+  background-color: rgba(0, 0, 0, .05) !important;
+  color: $secondary;
+
+  .badge {
+    @extend .badge-secondary;
+    color: $light;
+  }
+}
+
+// invalid custom file input
+.custom-file.is-invalid .custom-file-label {
+  border-color: $red;
+}
+

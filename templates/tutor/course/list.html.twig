@@ -1,0 +1,52 @@
+{% extends 'tutor/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+{% endblock %}
+
+{% block title %}Liste de cours / Espace parent{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Espace parents</a></li>
+            <li class="breadcrumb-item active">Liste des cours de mes enfants</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block tutor_content %}
+    {% if currentMember.member.students|length == 0 %}
+        <div class="alert alert-warning" role="alert">
+            <i data-feather="alert-triangle"></i>
+            Vous n'avez pas associé les comptes de vos enfants
+        </div>
+    {% else %}
+        <ul class="nav nav-pills bg-light p-3">
+            {% for student in currentMember.member.students %}
+                <li class="nav-item">
+                    <a class="nav-link{{ student == currentStudent ? ' active' }}"
+                       href="{{ path('tutor_student_course_list', {studentId: student.id}) }}">
+                        {{ student.firstName }} {{ student.lastName }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="py-2">
+        {% if currentStudent.subscriptions|filter(subscription => subscription.isActive)|length > 0 %}
+
+                {% include 'course/_list.html.twig' %}
+
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                <i data-feather="alert-triangle"></i>
+                {{ currentStudent.firstName }} {{ currentStudent.lastName }} n'a accès à aucun cours
+                car il/elle ne possède pas d'abonnement actif
+            </div>
+        {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

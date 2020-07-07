@@ -1,0 +1,23 @@
+{% extends 'course/show_layout.html.twig' %}
+
+{% block course_content %}
+{% if course.exams|length > 0 %}
+    {% for i, exam in course.exams %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title">Évaluation #{{ i + 1 }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ exam.content|raw }}</p>
+                <hr/>
+                <button class="btn btn-outline-success correction">Afficher la correction</button>
+                <div class="card-text correction collapse">
+                    <div class="mt-4">
+                        {{ exam.correction|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

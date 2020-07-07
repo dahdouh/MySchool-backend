@@ -1,0 +1,76 @@
+{% set member = currentMember.member %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Modifier mes informations</h5>
+        <form method="post" action="{{ path('member_information_save_action') }}">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="accountFirstName">Prénom</label>
+                    <input type="text" id="accountFirstName"
+                           value="{{ member.firstName }}"
+                           name="firstName"
+                           class="form-control" placeholder="Prénom">
+                </div>
+                <div class="col">
+                    <label for="accountLastName">Nom</label>
+                    <input type="text" id="accountLastName"
+                           value="{{ member.lastName }}"
+                           name="lastName"
+                           class="form-control" placeholder="Nom">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="accountEmail">Email</label>
+                    <input type="email" id="accountEmail"
+                           value="{{ member.email }}"
+                           name="email"
+                           class="form-control" placeholder="Adresse email">
+                    <small class="text-muted">Vous allez être invité à vous reconnecter
+                        si vous modifiez ce champ</small>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="registerBirthDate">Date de naissance</label>
+                    <input type="text" class="form-control"
+                           id="registerBirthDate" required>
+                    <input type="hidden" name="date_birth" id="registerHiddenBirthDate"
+                           value="{{ member.dateBirth|date('d/m/Y') }}">
+                </div>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Modifier mon mot de passe</h5>
+        <form method="post" class="my-3" action="{{ path('member_password_save_action') }}">
+            <div class="input-group">
+                <input type="password" name="password" class="form-control" placeholder="Nouveau mot de passe"
+                       aria-label="Nouveau mot de passe" aria-describedby="newPassword">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" id="newPassword">Enregistrer</button>
+                </div>
+            </div>
+            <small class="text-muted">Vous allez être invité à vous reconnecter
+                si vous modifiez ce champ</small>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <a href="{{ path('member_delete_action') }}" class="btn btn-danger"
+           data-alert="Êtes-vous sûr de vouloir vous désinsrire de Schoolax ? Cette action est irréversible.">
+            <i data-feather="x"></i>
+            Supprimer mon compte
+        </a>
+    </div>
+</div>

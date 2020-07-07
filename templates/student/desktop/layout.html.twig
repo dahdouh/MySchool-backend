@@ -1,0 +1,22 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Mon bureau</h1>
+        <p class="lead">Bienvenue sur votre <strong>bureau</strong>,
+        c'est ici que vous pouvez gérer vos documents personnels et vos événements à venir</p>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'event' ? ' active' }}"
+               href="{{ path('desktop_calendar') }}">Mon calendrier</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'document' ? ' active' }}"
+               href="{{ path('desktop_document') }}">Mes documents</a>
+        </li>
+    </ul>
+
+    {% block desktop_content %}{% endblock %}
+{% endblock %}

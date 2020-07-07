@@ -1,0 +1,33 @@
+{% extends 'course/show_layout.html.twig' %}
+
+{% block course_content %}
+{% if course.videos|length > 0 %}
+    <div class="card-columns">
+        {% for video in course.videos %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">{{ video.name }}</h5>
+                </div>
+
+                {% if video.file %}
+                    <div class="embed-responsive embed-responsive-21by9 card-img-top">
+                        <video loop controls>
+                            <source src="{{ asset(video.file) }}" type="video/{{ video.fileExtension }}" />
+                        </video>
+                    </div>
+                {% else %}
+                    <div class="card-img-top text-center bg-light py-5">
+                        <i data-feather="frown"
+                           class="no-width" width="100" height="100" stroke-width="1"></i>
+                        <br/>Impossible de récupérer cette vidéo
+                    </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <p class="card-text">{{ video.description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

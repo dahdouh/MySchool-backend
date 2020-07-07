@@ -1,0 +1,22 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+{% endblock %}
+
+{% block title %}Liste des sujets des forums / Espace admnistrateur{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_index') }}">Espace admnistrateur</a></li>
+            <li class="breadcrumb-item">Forum</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block admin_content %}
+{% include  "topic/_list.html.twig" %}
+{% endblock %}

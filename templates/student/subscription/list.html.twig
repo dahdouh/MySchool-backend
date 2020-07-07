@@ -1,0 +1,157 @@
+{% extends 'student/layout.html.twig' %}
+
+{% block title %}Liste de mes abonnements / Espace étudiant{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('student_index') }}">Espace étudiant</a></li>
+            <li class="breadcrumb-item active">Liste de mes abonnements</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block student_content %}
+
+    {% set difference = date("now").diff(date(currentMember.member.dateBirth)) %}
+    {% set age = difference.y %}
+
+    {% if age < 18 %}
+        <div class="alert alert-warning" role="alert">
+            <i data-feather="alert-triangle"></i>
+            Seul un parent peut gérer vos abonnements car vous n'avez pas encore 18 ans
+        </div>
+    {% else %}
+        <div class="d-flex justify-content-end my-3">
+            {% if currentMember.member.subscriptions|
+                filter(subscription => subscription.isActive)|length > 0 %}
+                <div class="dropdown dropright show mr-3">
+                    <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                        <i data-feather="clock"></i>
+                        Prolonger l'abonnement courant
+                    </button>
+
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                           href="{{ path("student_subscription_extend_action",
+                               {duration: "+ 1 week"}) }}">
+                            d'une semaine
+                        </a>
+                        <a class="dropdown-item"
+                           href="{{ path("student_subscription_extend_action",
+                               {duration: "+ 1 month"}) }}">
+                            d'un mois
+                        </a>
+                        <a class="dropdown-item"
+                           href="{{ path("student_subscription_extend_action",
+                               {duration: "+ 3 months"}) }}">
+                            de trois mois
+                        </a>
+                        <a class="dropdown-item"
+                           href="{{ path("student_subscription_extend_action",
+                               {duration: "+ 6 months"}) }}">
+                            de six mois
+                        </a>
+                        <a class="dropdown-item"
+                           href="{{ path("student_subscription_extend_action",
+                               {duration: "+ 1 year"}) }}">
+                            d'un an
+                        </a>
+                    </div>
+                </div>
+
+                <a href="{{ path('student_subscription_deactivate_action') }}"
+                   data-alert="Êtes-vous sûr de vouloir désactiver l'abonnement courant ? Cette action sera irréversible."
+                   class="btn btn-danger mr-3">
+                    <i data-feather="x"></i>
+                    Désactiver l'abonnement courant
+                </a>
+
+                <span class="btn btn-success disabled"
+                      style="cursor: not-allowed;"
+                      data-toggle="tooltip"
+                      title="Vous ne pouvez pas prendre de nouvel abonnement
+                          tant que vous en possédez un toujours actif">
+                        <i data-feather="plus"></i>
+                            Souscrire un nouvel abonnement
+                    </span>
+            {% else %}
+                <a href="{{ path('student_subscription_form') }}" class="btn btn-success">
+                    <i data-feather="plus"></i>
+                    Souscrire un nouvel abonnement
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if currentMember.member.subscriptions|length > 0 %}
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Statut</th>
+                <th scope="col">Niveau</th>
+                <th scope="col">Matières</th>
+                <th scope="col">Période d'activité</th>
+                <th scope="col">Prix</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for subscription in
+                currentMember.member.subscriptions|sort((a, b) => a.dateStart < b.dateStart) %}
+                <tr{{ not subscription.isActive ? ' class="disabled"' }}>
+                    <td>
+                        {% if subscription.isActive %}
+                            <span class="badge badge-success">Actif</span>
+                        {% else %}
+                            <span class="badge badge-light">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-secondary">{{ subscription.level.name }}</span>
+                    </td>
+                    <td>
+                        {% for subject in subscription.subjects %}
+                            <span class="badge badge-secondary">{{ subject.name }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <strong>
+                            {% set difference = date(subscription.dateStart).
+                                diff(date(subscription.dateEnd)) %}
+
+                            {% if (difference.y > 0) %}
+                                {{ difference.y }} an{{ difference.y > 1 ? "s" }}
+                            {% else %}
+                                {{ difference.m }} mois
+                            {% endif %}
+                            {% set age = difference.y %}
+                        </strong>
+
+                        (du {{ subscription.dateStart|date("d/m/Y") }} au
+                        {{ subscription.dateEnd|date("d/m/Y") }})
+                    </td>
+                    <td>
+                        {{ subscription.price }}€
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i data-feather="info"></i>
+            Vous n'avez souscrit aucun abonnement pour le moment
+        </div>
+
+        {% if age < 18 %}
+            <div class="alert alert-warning" role="alert">
+                <i data-feather="alert-triangle"></i>
+                Seul un parent peut gérer vos abonnements car vous n'avez pas encore 18 ans
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+{% endblock %}

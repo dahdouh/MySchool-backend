@@ -1,0 +1,26 @@
+{% extends 'layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href={{ path('index') }}>Accueil</a></li>
+            <li class="breadcrumb-item"><a href={{ path('forum_index') }}>Forum</a></li>
+            <li class="breadcrumb-item active">{{ forum.level.name }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %} {{ forum.level.name }} {% endblock %}
+
+{% block content %}
+<h1 class="text-center text-dark">Forum</h1>
+<h2 class="text-center text-dark font-weight-light">{{ forum.level.name }}</h2>
+
+{% include  "topic/_list.html.twig" %}
+
+{% endblock %}

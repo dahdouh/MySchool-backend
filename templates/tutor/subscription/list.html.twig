@@ -1,0 +1,167 @@
+{% extends 'tutor/layout.html.twig' %}
+
+{% block title %}Liste des abonnements de mes abonnements / Espace parent{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Espace enseignant</a></li>
+            <li class="breadcrumb-item active">Liste des abonnements de mes enfants</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block tutor_content %}
+
+    <p class="text-right my-1">
+        <a href="{{ path('tutor_add_student_form') }}" class="btn btn-success">
+            <i data-feather="plus"></i>
+            Ajouter un enfant
+        </a>
+    </p>
+
+    {% if currentMember.member.students|length > 0 %}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Enfant</th>
+                <th scope="col">Statut</th>
+                <th scope="col">Niveau</th>
+                <th scope="col">Matières</th>
+                <th scope="col">Période d'activité</th>
+                <th scope="col">Prix</th>
+                <th scope="col" class="text-right">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for student in currentMember.member.students %}
+                {% set activeSubscription = student.subscriptions|
+                    filter(subscription => subscription.isActive)|first %}
+                <tr>
+                    <td>
+                        <a href="{{ path('member_profile', {id: student.id}) }}">
+                            {{ student.firstName }} {{ student.lastName }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if activeSubscription|length > 0 %}
+                            <span class="badge badge-success">Actif</span>
+                        {% else %}
+                            <span class="badge badge-light">Pas d'abonnement actif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if activeSubscription|length > 0 %}
+                            <span class="badge badge-secondary">{{ activeSubscription.level.name }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if activeSubscription|length > 0 %}
+                            {% for subject in activeSubscription.subjects %}
+                                <span class="badge badge-secondary">{{ subject.name }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if activeSubscription|length > 0 %}
+                            <strong>
+                                {% set difference = date(activeSubscription.dateStart).
+                                    diff(date(activeSubscription.dateEnd)) %}
+
+                                {% if (difference.y > 0) %}
+                                    {{ difference.y }} an{{ difference.y > 1 ? "s" }}
+                                {% else %}
+                                    {{ difference.m }} mois
+                                {% endif %}
+                                {% set age = difference.y %}
+                            </strong>
+
+                            (du {{ activeSubscription.dateStart|date("d/m/Y") }} au
+                            {{ activeSubscription.dateEnd|date("d/m/Y") }})
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if activeSubscription|length > 0 %}
+                            {{ activeSubscription.price }}€
+                        {% endif %}
+                    </td>
+                    <td class="text-right d-flex justify-content-end">
+                        {% if activeSubscription %}
+                            <div class="dropdown dropright show mr-3" data-toggle="tooltip"
+                                 title="Prolonger l'abonnement actif de {{ student.firstName }} {{ student.lastName }}">
+                                <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                                    <i data-feather="clock"></i>
+                                </button>
+
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item"
+                                       href="{{ path("tutor_subscription_extend_action",
+                                           {duration: "+ 1 week", id: student.id}) }}">
+                                        d'une semaine
+                                    </a>
+                                    <a class="dropdown-item"
+                                       href="{{ path("tutor_subscription_extend_action",
+                                           {duration: "+ 1 month", id: student.id}) }}">
+                                        d'un mois
+                                    </a>
+                                    <a class="dropdown-item"
+                                       href="{{ path("tutor_subscription_extend_action",
+                                           {duration: "+ 3 months", id: student.id}) }}">
+                                        de trois mois
+                                    </a>
+                                    <a class="dropdown-item"
+                                       href="{{ path("tutor_subscription_extend_action",
+                                           {duration: "+ 6 months", id: student.id}) }}">
+                                        de six mois
+                                    </a>
+                                    <a class="dropdown-item"
+                                       href="{{ path("tutor_subscription_extend_action",
+                                           {duration: "+ 1 year", id: student.id}) }}">
+                                        d'un an
+                                    </a>
+                                </div>
+                            </div>
+                            <a href="{{ path('tutor_subscription_deactivate_action', {id: student.id}) }}" type="button"
+                               data-toggle="tooltip"
+                               title="Annuler l'abonnement actif de {{ student.firstName }} {{ student.lastName }}"
+                               class="btn btn-danger mr-3"
+                               data-alert="Êtes-vous sûr de vouloir désactiver l'abonnement actif de {{ student.firstName }} {{ student.lastName }} ?">
+                                <i data-feather="x"></i>
+                            </a>
+                            <span class="btn btn-success mr-3"
+                                  style="cursor: not-allowed;"
+                                  data-toggle="tooltip"
+                                  title="Vous ne pouvez pas prendre de nouvel abonnement pour
+                            {{ student.firstName }} {{ student.lastName }}
+                            tant que votre enfant en posséde un toujours actif">
+                                <i data-feather="plus"></i>
+                            </span>
+                        {% else %}
+                            <a href="{{ path('tutor_subscription_form', {id: student.id}) }}"
+                               data-toggle="tooltip"
+                               title="Souscire un nouvel abonnement pour {{ student.firstName }} {{ student.lastName }}"
+                               class="btn btn-success mr-3">
+                                <i data-feather="plus"></i>
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('tutor_remove_student_action', {id: student.id}) }}" type="button"
+                           data-toggle="tooltip"
+                           title="Dissocier ce compte étudiant"
+                           class="btn btn-danger mr-3"
+                           data-alert="Êtes-vous sûr de vouloir dissocier le compte de {{ student.firstName }} {{ student.lastName }} du vôtre ?">
+                            <i data-feather="user-minus"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i data-feather="info"></i>
+            Ajoutez vos enfants pour gérer leurs abonnements
+        </div>
+    {% endif %}
+
+{% endblock %}

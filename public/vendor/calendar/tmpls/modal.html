@@ -1,0 +1,37 @@
+<%
+event.date_start = new Date(parseInt(event.start));
+event.date_end = new Date(parseInt(event.end));
+%>
+
+<div class="modal-body">
+    <span class="badge badge-secondary">
+        Débute le
+        <%= event.date_start.getDate() %>
+        <%= calendar.locale["m" + event.date_start.getMonth()] %>
+        <%= event.date_start.getFullYear() %>, à
+        <%= event.date_start.getHours() %>h<%= event.date_start.getMinutes() %>
+    </span>
+
+    <% if (event.date_end != "Invalid Date") { %>
+    <span class="badge badge-secondary">
+        Termine le
+        <%= event.date_end.getDate() %>
+        <%= calendar.locale["m" + event.date_end.getMonth()] %>
+        <%= event.date_end.getFullYear() %> à
+        <%= event.date_end.getHours() %>h<%= event.date_end.getMinutes() %>
+    </span>
+    <% } %>
+
+    <p><%= event.description %></p>
+</div>
+<div class="modal-footer">
+    <a href="/student/desktop/event/<%= event.id %>/form" class="btn btn-primary">Modifier</a>
+    <% if (event.url != "") { %>
+    <a href="<%= event.url %>" class="btn btn-primary">Rejoindre l'évènement</a>
+    <% } %>
+    <a href="/student/desktop/event/<%= event.id %>/delete" type="button" class="btn btn-danger"
+        data-alert="Êtes-vous sûr de vouloir supprimer l'évènement <%= event.title %> ?">
+        <i data-feather="x"></i>
+        Supprimer
+    </a>
+</div>

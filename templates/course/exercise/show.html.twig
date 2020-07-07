@@ -1,0 +1,23 @@
+{% extends 'course/show_layout.html.twig' %}
+
+{% block course_content %}
+{% if course.exercises|length > 0 %}
+    {% for i, exercise in course.exercises %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title">Exercice #{{ i + 1 }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ exercise.content|raw }}</p>
+                <hr/>
+                <button class="btn btn-outline-success correction">Afficher la correction</button>
+                <div class="card-text correction collapse">
+                    <div class="mt-4">
+                        {{ exercise.correction|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

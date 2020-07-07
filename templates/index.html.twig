@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/index.css') }}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/jquery-aniview/dist/jquery.aniview.js"></script>
+    <script src="{{ asset('js/index.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <header>
+        <div class="content">
+            <div class="container">
+                <h1 class="text-white font-weight-bold">Schoolax</h1>
+                <p class="text-light subtitle">Schoolax un max</p>
+                {% if not is_granted("IS_AUTHENTICATED_FULLY") %}
+                    <button class="btn btn-outline-light"
+                            data-toggle="modal"
+                            data-target="#registerModal">Commencer
+                    </button>
+                {% endif %}
+            </div> 
+        </div>
+        <div class="img"></div>
+
+        <div class="wave">
+
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1366 157">
+                <path class="cls-1" d="M0,102C716,248,1366,0,1366,0V157H0Z"/>
+            </svg>
+        </div>
+
+        <div class="video aniview" data-av-animation="fadeInRight">
+            <i data-feather="play"></i>
+        </div>
+    </header>
+
+    <section class="container pt-5 mt-5 section">
+        <h2 class="text-dark">Découvrez des cours variés</h2>
+
+        <div class="container pt-5 mt-5">
+
+            <ul class="bubbles">
+                {# maths #}
+                <li class="bubble"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="Mathématiques">
+                    <img src="{{ asset('img/icon/mathematics.png') }}" alt="maths icon"/>
+                </li>
+
+                {# french #}
+                <li class="bubble size2"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Français">
+                    <img src="{{ asset('img/icon/book.png') }}" alt="book icon"/>
+                </li>
+
+                {# english #}
+                <li class="bubble"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Anglais">
+                    <img src="{{ asset('img/icon/english.png') }}" alt="english icon"/>
+                </li>
+
+                {# history #}
+                <li class="bubble size2"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="Histoire">
+                    <img src="{{ asset('img/icon/pillar.png') }}" alt="pillar icon"/>
+                </li>
+
+                {# geo #}
+                <li class="bubble size2"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Géographie">
+                    <img src="{{ asset('img/icon/globe.png') }}" alt="globe icon"/>
+                </li>
+
+                {# biology #}
+                <li class="bubble"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="SVT">
+                    <img src="{{ asset('img/icon/brain.png') }}" alt="brain icon"/>
+                </li>
+
+                {# physics/chemistry #}
+                <li class="bubble"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Physique-Chimie">
+                    <img src="{{ asset('img/icon/rocket.png') }}" alt="rocket icon"/>
+                </li>
+            </ul>
+
+        </div>
+    </section>
+
+    <section class="container pt-5 mt-5 section">
+        <h2 class="text-dark">Différents supports pour mieux assimiler</h2>
+
+        <div class="card-group pt-5 mt-5 aniview" data-av-animation="zoomIn">
+            <div class="card">
+                <img src="{{ asset('img/card1.png') }}" class="card-img-top" alt="header card 1">
+                <div class="card-body">
+                    <h5 class="card-title">Fiches de cours</h5>
+                    <p class="card-text">This is a wider card with supporting text below as a natural
+                        lead-in to additional content. This content is a little bit longer.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="{{ asset('img/card2.png') }}" class="card-img-top" alt="header card 2">
+                <div class="card-body">
+                    <h5 class="card-title">Exercices</h5>
+                    <p class="card-text">This card has supporting text below as a natural
+                        lead-in to additional content.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="{{ asset('img/card3.png') }}" class="card-img-top" alt="header card 3">
+                <div class="card-body">
+                    <h5 class="card-title">QCM</h5>
+                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in
+                        to additional content. This card has even longer content than the first to show
+                        that equal height action.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+{% endblock %}

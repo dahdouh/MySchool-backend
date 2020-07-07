@@ -1,0 +1,48 @@
+{% extends 'layout.html.twig' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item">Espace admnistrateur</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Espace administrateur</h1>
+        <p class="lead">Bienvenue sur votre espace administrateur</p>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link{{ nav is defined and nav == "member" or nav is not defined ? " active" }}"
+               href="{{ path('admin_member_list') }}">Membres</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav is defined and nav == "course" ? " active" }}"
+               href="{{ path('admin_course_list') }}">Cours</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav is defined and nav == "forum" ? " active" }}"
+               href="{{ path('admin_forum_list') }}">Forums</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav is defined and nav == "level" ? " active" }}"
+               href="{{ path('admin_level_list') }}">Niveaux</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav is defined and nav == "subject" ? " active" }}"
+               href="{{ path('admin_subject_list') }}">Matières</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{ nav == 'historic' ? ' active' }}"
+               href="{{ path('admin_historic') }}">Mon historique</a>
+        </li>
+    </ul>
+
+    <div class="py-3">
+        {% block admin_content %}{% endblock %}
+    </div>
+{% endblock %}

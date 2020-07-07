@@ -1,0 +1,146 @@
+{% extends 'course/show_layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/course/show_quiz.js') }}"></script>
+{% endblock %}
+
+{% block course_content %}
+{% for i, quiz in course.quizzes %}
+    <div class="card mb-3">
+        <div class="card-header">
+            Quiz #{{ i + 1 }}
+        </div>
+        {% if quizAttempts %}
+        {% set attemptsForThisQuiz = 0 %}
+        <ul class="list-group list-group-flush">
+        {% for quizAttempt in quizAttempts %}
+            {% if quizAttempt.quiz.id == quiz.id %}
+                {% set attemptsForThisQuiz = attemptsForThisQuiz + 1 %}
+                <li class="list-group-item">
+                    Tentative du {{ quizAttempt.date|date("d/m/Y") }} : <b>{{ quizAttempt.score }}/10</b>
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="card-body">
+            <button type="button" data-toggle="modal" data-target="#modalQuiz{{ quiz.id }}"
+                    class="btn btn-primary">{{ attemptsForThisQuiz == 0 ? "Commencer" : "Recommencer" }} ce quiz
+            </button>
+        </div>
+
+        <div class="modal quiz fade" id="modalQuiz{{ quiz.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                {% for j, question in quiz.questions %}
+                    <div class="blockQuestion{{ j > 0 ? ' collapse' }}">
+                        <input type="hidden" name="quizId" value="{{ quiz.id }}">
+                        <input type="hidden" name="questionId" value="{{ question.id }}">
+                        {% if j > 0 %}
+                            <input type="hidden" name="quizAttemptId">
+                        {% endif %}
+
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                Quiz #{{ i + 1 }}
+                            </h4>
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                {{ question.content }}
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-warning collapse" role="alert">
+                                <i data-feather="alert-triangle"></i>
+                                Vous devez choisir une réponse avant de passer à la suite
+                            </div>
+                            <ul class="list-group list-group-flush">
+                            {% for choice in question.choices|shuffle %}
+                                <li class="list-group-item">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="choice{{ choice.id }}"
+                                               value="{{ choice.id }}"
+                                               name="choiceForQuestion{{ question.id }}"
+                                               class="custom-control-input">
+                                        <label class="custom-control-label"
+                                               for="choice{{ choice.id }}">
+                                            {{ choice.content }}
+                                        </label>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <small>Question {{ j + 1 }} sur {{ quiz.questions|length }}</small>
+                            <div>
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        data-dismiss="modal">Fermer
+                                </button>
+                                {% if j == quiz.questions|length - 1 %}
+                                <button type="button" class="btn btn-primary showScore">
+                                    Terminer
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-primary nextQuestion">
+                                    Suivant
+                                    <i data-feather="arrow-right"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                    <div class="collapse blockScore">
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                Quiz #{{ i + 1 }}
+                            </h4>
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Note finale
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="alert alert-secondary collapse" role="alert">
+                                <i data-feather="meh"></i> Faites mieux la prochaine fois !
+                            </div>
+
+                            <div class="alert alert-success collapse" role="alert">
+                                <i data-feather="smile"></i> Bravo, vous avez réussi ce quiz !
+                            </div>
+
+                            <p class="card-text">
+                                Le quiz est terminé, voici votre note finale :
+                                <b><span class="score"></span>/10</b>
+                            </p>
+                            <p class="card-text">
+                                Vous avez répondu juste à <span class="nbRightAnswers"></span>
+                                sur {{ quiz.questions|length }}
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{{ path(app.request.get('_route'),
+                                {id_course: app.request.get('id_course')}) }}"
+                               class="btn btn-secondary">Fermer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

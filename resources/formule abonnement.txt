@@ -1,0 +1,32 @@
+Formule :
+(nombreMatière*prixMatière) * (0.9^nombreMois) * nombreMois = PrixTotal
+avec prixMatière fixé à 10€
+
+///////
+
+Exemples :
+1 matière pendant 1 mois :
+(1*10) * (0.9^1) * (1 mois) = 9€
+
+1 matière pendant 6 mois :
+(1*10) * (0.9^6) * (6 mois) = 31.88€ (soit 5.31€/mois)
+
+1 matière pendant 1 an :
+(1*10) * (0.9^12) * (12 mois) = 33.89€ (soit 2.82€/mois)
+
+----
+
+5 matières pendant 1 mois :
+(5*10) * (0.9^1) * (1 mois) = 45€
+
+5 matières pendant 6 mois :
+(5*10) * (0.9^6) * (6 mois) = 159€ (soit 13.25€/mois)
+
+5 matières pendant 1 an :
+(5*10) * (0.9^12) * (12 mois) = 168€ (soit 14€/mois)
+
+/////
+
+Repères :
+0.9^6 = 0.53 (6 mois)
+0.9^12 = 0,28 (1 an)

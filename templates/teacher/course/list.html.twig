@@ -1,0 +1,22 @@
+{% extends 'teacher/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+{% endblock %}
+
+{% block title %}Liste de mes cours / Espace enseignant{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('teacher_index') }}">Espace enseignant</a></li>
+            <li class="breadcrumb-item active">Liste de mes cours</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block teacher_content %}
+{% include 'course/_list.html.twig' %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% if actions|length == 0 %}
+    <div class="alert alert-warning" role="alert">
+        <i data-feather="alert-triangle"></i>
+        Votre historique est vide
+    </div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        <i data-feather="info"></i>
+        {% if actions|length == 1 %}
+            1 action a été trouvée
+        {% else %}
+            {{ actions|length }} actions ont été trouvées
+        {% endif %}
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Intitulé</th>
+            <th scope="col">Date</th>
+            <th scope="col">Voir l'action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for action in actions %}
+            <tr>
+                <td>
+                    {{ action.description }}
+                </td>
+                <td>
+                    {{ action.date|date('d/m/Y à H:i') }}
+                </td>
+                <td>
+                    {% if action.link %}
+                    <a href="{{ action.link }}"
+                       class="btn btn-secondary">
+                        <i data-feather="search"></i>
+                        Consulter
+                    </a>
+                    {% else %}
+                        <span class="text-muted">--</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% include  "common/_pagination.html.twig" %}

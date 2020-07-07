@@ -1,0 +1,38 @@
+{% extends 'course/create_layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/form.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/course/create_quiz.js') }}"></script>
+{% endblock %}
+
+{% block form_course_content %}
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('document_form', {id_course:course.id}) }}"
+           class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à l'étape précédente
+        </a>
+        <a href="{{ path('exercise_form', {id_course:course.id}) }}"
+           class="btn btn-light">
+            Passer à l'étape suivante
+            <i data-feather="arrow-right"></i>
+        </a>
+    </div>
+
+    {% if course.quizzes|length > 0 %}
+        {% for k, quiz in course.quizzes %}
+            {% include "course/quiz/_form.html.twig" with {'k': k, 'quiz': quiz} %}
+        {% endfor %}
+        {% include "course/quiz/_form.html.twig" with {'k': course.quizzes|length, 'hide':true} %}
+    {% else %}
+        {% include "course/quiz/_form.html.twig" with {'k': 0} %}
+    {% endif %}
+
+    {% if course.quizzes|length > 0 %}
+        <button id="addForm" type="button" class="btn btn-link btn-lg">
+            <i data-feather="plus"></i>
+            Ajouter une autre quiz
+        </button>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'tutor/layout.html.twig' %}
+
+{% block title %}Mon profil / Espace parent{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Espace parent</a></li>
+            <li class="breadcrumb-item active">Mon profile</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block tutor_content %}
+{% include 'member/_profile.html.twig' %}
+{% endblock %}

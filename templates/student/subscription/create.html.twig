@@ -1,0 +1,39 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Nouvel abonnement / Espace étudiant{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/course/main.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/subscription/create.js') }}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('student_index') }}">Espace étudiant</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('student_subscription_list') }}">
+                    Liste de mes abonnements
+                </a></li>
+            <li class="breadcrumb-item active">Nouvel abonnement</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center text-dark mb-5">Nouvel abonnement</h1>
+
+    <div class="my-3">
+        <a href="{{ path('student_subscription_list') }}" class="btn btn-light">
+            <i data-feather="arrow-left"></i>
+            Retourner à la liste de mes abonnements
+        </a>
+    </div>
+
+    <form method="post" action="{{ path('student_subscription_new_action') }}">
+        {% include "subscription/_create.html.twig" %}
+    </form>
+
+{% endblock %}

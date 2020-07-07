@@ -1,0 +1,17 @@
+{% extends 'tutor/layout.html.twig' %}
+
+{% block title %}Mon historique / Espace parent{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('tutor_index') }}">Espace parent</a></li>
+            <li class="breadcrumb-item">Mon historique</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block tutor_content %}
+    {% include "historic/_list.html.twig" %}
+{% endblock %}
