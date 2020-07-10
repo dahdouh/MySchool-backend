@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\KinshipRepository")
@@ -13,6 +14,7 @@ class Kinship
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("post:read")
      */
     private $id;
 
@@ -25,6 +27,7 @@ class Kinship
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Member")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post:read")
      */
     private $student;
 

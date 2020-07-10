@@ -8,6 +8,9 @@ use App\Entity\Level;
 use App\Entity\Subject;
 use App\Entity\Member;
 use App\Entity\Subscription;
+use App\Entity\Post;
+use App\Entity\Kinship;
+use App\Entity\HistoricAction;
 use App\Repository\CourseRepository;
 use App\Repository\LevelRepository;
 use App\Repository\MemberRepository;
@@ -16,6 +19,9 @@ use App\Repository\ExerciseRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\HistoricActionRepository;
 use App\Repository\ForumRepository;
+use App\Repository\PostRepository;
+use App\Repository\TopicRepository;
+use App\Repository\KinshipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +31,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use App\Service\CurrentMember;
 use DateTime;
 use DateInterval;
 
@@ -308,19 +315,128 @@ class CustomerController extends AbstractController
      */
     public function api_forum_list(Request $request, int $id, EntityManagerInterface $em, ForumRepository $forumRepository)
     {        
-        
-        //$query = $em->createQuery("SELECT lv.id FROM App\Entity\Level lv JOIN lv.subscriptions sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id." GROUP BY lv.id");
-        //$levels = $query->getArrayResult();
-
         $query = $em->createQuery("SELECT tp FROM App\Entity\Topic tp JOIN tp.forum f JOIN f.level l WHERE l.id in (SELECT lv.id FROM App\Entity\Level lv JOIN lv.subscriptions sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id." GROUP BY lv.id)");
         //$query = $em->createQuery("SELECT his FROM App\Entity\Forum his JOIN his.actor a WHERE a.id=".$id."");
         $topics = $query->getResult();
- 
-
-        //return $this->json($levels, 200, [], ['groups'=> 'post:read']);  
         return $this->json($topics[0], 200, [], ['groups'=> 'post:read']);  
+     }
+
+    /**
+     * @Route("/api/forum/{id}/posts", name="api_forum_posts")
+     */
+    public function api_forum_posts(Request $request, int $id, EntityManagerInterface $em, PostRepository $postRepository)
+    {        
+        $query = $em->createQuery("SELECT p FROM App\Entity\Post p JOIN p.topic t WHERE t.id=".$id."");
+        //$query = $em->createQuery("SELECT  FROM App\Entity\Fohisrum his JOIN his.actor a WHERE a.id=".$id."");
+        $posts = $query->getResult();
+        return $this->json($posts, 200, [], ['groups'=> 'post:read']);  
+    }
+
+    /**
+     * @Route("/api/forum/{id_topic}/posts/add/{id_author}/{content}", name="api_forum_posts_add")
+     */
+    public function api_forum_post_new(Request $request, int $id_topic, string $id_author, string $content, EntityManagerInterface $manager,  
+                    MemberRepository $memberRepository, TopicRepository $topicRepository,  PostRepository $postRepository)
+    {
+        
+        $author = $memberRepository->find($id_author);
+        $topic = $topicRepository->find($id_topic);
+        $post = new Post();
+        $post->setAuthor($author);
+        $post->setTopic($topic);
+        $post->setContent($content);
+        $post->setDate(new DateTime("now"));
+        $manager->persist($post);
+        $manager->flush();
+
+        return $this->json($post, 200, [], ['groups'=> 'post:read']);                  
 
      }
+
+
+      /*
+     @Route("/api/subscription/list/parent/{id}", name="api_subscription_list_parent")
+     
+    public function api_subscription_list_parent(Request $request, int $id, EntityManagerInterface $em,  
+    MemberRepository $memberRepository, SubscriptionRepository $subscriptionRepository, LevelRepository $levelRepository,  SubjectRepository $subjectRepository)
+        {
+        //$query = $em->createQuery("SELECT lv FROM App\Entity\Level lv  JOIN lv.courses c JOIN lv.subscriptions sb JOIN sb.student st  WHERE sb.isActive=1 AND st.id=".$id."");
+        //$query = $em->createQuery("SELECT u FROM App\Entity\Member u JOIN u.kinshipStudents k JOIN k.student s JOIN s.subscriptions sb WHERE sb.isActive=1 AND u.id=".$user_connected_id."");
+        //$query = $em->createQuery("SELECT k FROM App\Entity\Kinship sb JOIN sb.student s JOIN sb.subjects sj WHERE sb.isActive=1 AND s.id=".$id."");
+
+        //$query = $em->createQuery("SELECT k.tutor FROM App\Entity\Kinship k JOIN k.tutor p WHERE p.id=".$id." GROUP BY k.id
+        //                           SELECT u.id FROM App\Entity\Member u JOIN u.kinshipStudents k JOIN k.tutor p WHERE p.id=".$id." GROUP BY k.id");
+
+        $query = $em->createQuery("SELECT sb FROM App\Entity\Subscription sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id."");
+
+        $subscriptions = $query->getResult();
+
+        return $this->json($subscriptions, 200, [], ['groups'=> 'post:read']);                  
+
+        }
+        */
+
+    /**
+     * @Route("/api/tutor/child/list/{user_connected_id}", name="api_tutor_child_list", methods={"GET"})
+     */
+    public function api_tutor_child_list(Request $request, string $user_connected_id, EntityManagerInterface $em, KinshipRepository $kinshipRepository, MemberRepository $memberRepository, CurrentMember $currentMember)
+    {
+        $tutor = $memberRepository->find($user_connected_id);
+        
+        //$query = $em->createQuery("SELECT u FROM App\Entity\Member u JOIN u.kinshipStudents k JOIN k.student s JOIN s.subscriptions sb WHERE sb.isActive=1 AND u.id=".$user_connected_id."");
+        //$tutor = $query->getResult();
+
+        if($tutor != null) {
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            $tutor->setEmail("not found");
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);
+        }
+        
+    }
+
+     /**
+     * @Route("/api/tutor/add/child/{email}/{user_connected_id}", name="api_tutor_add_child", methods={"GET"})
+     */
+    public function api_tutor_add_child(Request $request, string $email, string $user_connected_id, EntityManagerInterface $em, KinshipRepository $kinshipRepository, MemberRepository $memberRepository, CurrentMember $currentMember)
+    {
+        $student = $memberRepository->findOneBy(['email' => $email]);
+        $tutor = $memberRepository->find($user_connected_id);
+
+        if (!$student) {
+            $tutor->setEmail("not found");
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);  
+        } else if ($kinshipRepository->findOneBy(["student" => $student, "tutor" => $tutor])) {
+            $tutor->setEmail("already your child");
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);  
+        } else if ($kinshipRepository->findOneBy(["student" => $student])) {
+            $tutor->setEmail("already associated");
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);  
+            
+        } else {
+            $kinship = new Kinship();
+            $kinship->setStudent($student);
+            $kinship->setTutor($tutor);
+            $em->persist($kinship);
+            $em->flush();
+            return $this->json($tutor, 200, [], ['groups'=> 'post:read']);  
+        }
+    }
+
+
+    /**
+     * @Route("/api/tutor/child/delete/{user_child_id}", name="api_tutor_child_delete", methods={"GET"})
+     */
+    public function api_tutor_child_delete(Request $request, string $user_child_id, EntityManagerInterface $em, KinshipRepository $kinshipRepository)
+    {
+        
+        $kinship = $kinshipRepository->find($user_child_id);; 
+        $em->remove($kinship);
+        $em->flush();
+
+        return $this->json($kinship, 200, [], ['groups'=> 'post:read']); 
+    }
+
 
     
 

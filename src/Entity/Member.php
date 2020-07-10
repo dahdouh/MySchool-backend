@@ -87,6 +87,7 @@ class Member implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Kinship", mappedBy="tutor", orphanRemoval=true)
+     * @Groups("post:read")
      */
     private $kinshipStudents;
 
@@ -329,6 +330,37 @@ class Member implements UserInterface
         FileUploader::createDir("upload/member/", $this->getId());
 
         return "upload/member/" . $this->getId();
+    }
+
+    /**
+     * @return Collection|KinshipStudents[]
+     */
+    public function getKinshipStudents(): Collection
+    {
+        return $this->kinshipStudents;
+    }
+
+    public function addKinshipStudents(KinshipStudents $k): self
+    {
+        if (!$this->KinshipStudents->contains($k)) {
+            $this->KinshipStudents[] = $k;
+            $KinshipStudents->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKinshipStudents(KinshipStudents $k): self
+    {
+        if ($this->KinshipStudents->contains($k)) {
+            $this->KinshipStudents->removeElement($k);
+            // set the owning side to null (unless already changed)
+            if ($KinshipStudents->getAuthor() === $this) {
+                $KinshipStudents->setAuthor(null);
+            }
+        }
+
+        return $this;
     }
 
     /**
