@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\QuestionRepository")
@@ -15,13 +16,45 @@ class Question
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("post:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
      */
     private $content;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $response1;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $response2;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $response3;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $response4;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $response5;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz", inversedBy="questions")
@@ -58,6 +91,66 @@ class Question
     public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getResponse1(): ?string
+    {
+        return $this->response1;
+    }
+
+    public function setResponse1(string $response1): self
+    {
+        $this->response1 = $response1;
+
+        return $this;
+    }
+
+    public function getResponse2(): ?string
+    {
+        return $this->response2;
+    }
+
+    public function setResponse2(string $response2): self
+    {
+        $this->response2 = $response2;
+
+        return $this;
+    }
+
+    public function getResponse3(): ?string
+    {
+        return $this->response3;
+    }
+
+    public function setResponse3(string $response3): self
+    {
+        $this->response3 = $response3;
+
+        return $this;
+    }
+
+    public function getResponse4(): ?string
+    {
+        return $this->response4;
+    }
+
+    public function setResponse4(string $response4): self
+    {
+        $this->response4 = $response4;
+
+        return $this;
+    }
+
+    public function getResponse5(): ?string
+    {
+        return $this->response5;
+    }
+
+    public function setResponse5(string $response5): self
+    {
+        $this->response5 = $response5;
 
         return $this;
     }

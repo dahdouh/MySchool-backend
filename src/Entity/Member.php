@@ -161,6 +161,7 @@ class Member implements UserInterface
         $this->quizAttempts = new ArrayCollection();
         $this->desktopDocuments = new ArrayCollection();
         $this->actions = new ArrayCollection();
+        $this->kinshipStudents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -340,23 +341,23 @@ class Member implements UserInterface
         return $this->kinshipStudents;
     }
 
-    public function addKinshipStudents(KinshipStudents $k): self
+    public function addKinshipStudents(Kinship $kk): self
     {
-        if (!$this->KinshipStudents->contains($k)) {
-            $this->KinshipStudents[] = $k;
-            $KinshipStudents->setAuthor($this);
+        if (!$this->kinshipStudents->contains($kk)) {
+            $this->kinshipStudents[] = $kk;
+            $kinshipStudents->setAuthor($this);
         }
 
         return $this;
     }
 
-    public function removeKinshipStudents(KinshipStudents $k): self
+    public function removeKinshipStudents(Kinship $k): self
     {
-        if ($this->KinshipStudents->contains($k)) {
-            $this->KinshipStudents->removeElement($k);
+        if ($this->kinshipStudents->contains($k)) {
+            $this->kinshipStudents->removeElement($k);
             // set the owning side to null (unless already changed)
-            if ($KinshipStudents->getAuthor() === $this) {
-                $KinshipStudents->setAuthor(null);
+            if ($kinshipStudents->getAuthor() === $this) {
+                $kinshipStudents->setAuthor(null);
             }
         }
 

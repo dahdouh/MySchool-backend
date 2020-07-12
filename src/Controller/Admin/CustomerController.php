@@ -153,6 +153,37 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @Route("/api/cours/content/video/{id}", name="api_cours_content_video_list", methods={"GET"})
+     */
+    public function list_cours_content_video(Request $request, string $id, EntityManagerInterface $em)
+    {
+        $query = $em->createQuery("SELECT cont FROM App\Entity\CourseContent cont JOIN cont.course c WHERE cont.type=2 AND c.id=".$id."");
+        $users = $query->getResult();
+
+        if($users != null) {
+                return $this->json($users, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            return $this->json([], 200, [], ['groups'=> 'post:read']);
+        }
+    }
+
+    /**
+     * @Route("/api/cours/content/pdf/{id}", name="api_cours_content_pdf_list", methods={"GET"})
+     */
+    public function list_cours_content_pdf(Request $request, string $id, EntityManagerInterface $em)
+    {
+        $query = $em->createQuery("SELECT cont FROM App\Entity\CourseContent cont JOIN cont.course c WHERE cont.type=1 AND c.id=".$id."");
+        $users = $query->getResult();
+
+        if($users != null) {
+                return $this->json($users, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            return $this->json([], 200, [], ['groups'=> 'post:read']);
+        }
+    }
+
+
+    /**
      * @Route("/api/exercice/{id}", name="api_exercice_list", methods={"GET"})
      */
     public function list_exercice_list(Request $request, string $id,  MemberRepository $memberRepository, EntityManagerInterface $em)
@@ -182,6 +213,23 @@ class CustomerController extends AbstractController
                 return $this->json($exercice, 200, [], ['groups'=> 'post:read']);                  
         } else {
             return $this->json(["exercice", "not found"], 200, [], ['groups'=> 'post:read']);
+        }
+    }
+
+
+    /**
+     * @Route("/api/quiz/{course_id}", name="api_quiz_list", methods={"GET"})
+     */
+    public function list_quiz_list(Request $request, string $course_id,  MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $query = $em->createQuery("SELECT qu FROM App\Entity\Question qu JOIN qu.quiz qz JOIN qz.course c WHERE c.id=".$course_id." AND qu.response1!=''");
+        $quiz = $query->getResult();
+
+
+        if($quiz != null) {
+                return $this->json($quiz, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            return $this->json(["quiz", "not found"], 200, [], ['groups'=> 'post:read']);
         }
     }
 
