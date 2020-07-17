@@ -53,7 +53,6 @@ class CustomerController extends AbstractController
      */
     public function api_login(Request $request, string $email, string $password, EntityManagerInterface $manager, LevelRepository $levelRepository, MemberRepository $memberRepository)
     {
-        //$user = $memberRepository->find(22);
         $user = $memberRepository->findOneBy(['email' => $email]);
         if($user != null) {
             $valid = $this->passwordEncoder->isPasswordValid($user, $password);
@@ -66,6 +65,7 @@ class CustomerController extends AbstractController
             }
             
         } else {
+            $user = new Member();;
             $user->setEmail("not found");
             return $this->json($user, 200, [], ['groups'=> 'post:read']);  
             //return $this->json(["email", "not found"], 200, [], ['groups'=> 'post:read']);      
@@ -121,7 +121,7 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * @Route("/api/profile/{id}", name="api_password_reset", methods={"GET"})
+     * @Route("/api/profile/{id}", name="api_profile", methods={"GET"})
      */
     public function api_profile(Request $request, string $id,  MemberRepository $memberRepository, EntityManagerInterface $em)
     {
@@ -133,6 +133,29 @@ class CustomerController extends AbstractController
             return $this->json($user, 200, [], ['groups'=> 'post:read']);
         }
     }
+
+    /**
+     * @Route("/api/profile/update/{email}/{password}/{firstName}/{lastName}/{birthday}", name="api_profile_update", methods={"GET"})
+     */
+    public function api_profile_update(Request $request, string $email, string $password, string $firstName, string $lastName, string $birthday,  UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $user = $memberRepository->findOneBy(['email' => $email]);
+        if($user === null) {
+            $user->setEmail("already exist");
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);  
+        }
+        $member = new Member();
+        $user->setEmail($email);
+        $user->setPassword($encoder->encodePassword($member, $password));       
+        $user->setLastName($firstName);
+        $user->setFirstName($lastName);
+        $user->setDateBirth(new DateTime($birthday));
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+    }
+
 
     /**
      * @Route("/api/cours/{id}", name="api_cours_list", methods={"GET"})

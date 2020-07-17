@@ -135,6 +135,7 @@ class Member implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\DesktopDocument", mappedBy="student")
+     * @Groups("post:read")
      */
     private $desktopDocuments;
 

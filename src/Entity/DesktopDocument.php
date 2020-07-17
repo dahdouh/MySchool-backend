@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Service\FileUploader;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DesktopDocumentRepository")
@@ -15,11 +16,13 @@ class DesktopDocument
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("post:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
      */
     private $name;
 
@@ -66,6 +69,9 @@ class DesktopDocument
         return $this->getStudent()->getDir() . "/desktopDocument";
     }
 
+    /**
+     * @Groups("post:read")
+     */
     public function getFile()
     {
         // search file
