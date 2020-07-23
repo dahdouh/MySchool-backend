@@ -27,6 +27,12 @@ class Subject
     private $name;
 
     /**
+     * @ORM\Column(type="string", length=150)
+     * @Groups("post:read")
+     */
+    private $icon;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Course", mappedBy="subject", orphanRemoval=true)
      */
     private $courses;
@@ -67,6 +73,18 @@ class Subject
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(string $icon): self
+    {
+        $this->icon = $icon;
 
         return $this;
     }

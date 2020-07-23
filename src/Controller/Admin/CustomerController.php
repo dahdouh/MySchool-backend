@@ -176,6 +176,16 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @Route("/api/subject/list", name="api_subject_list", methods={"GET"})
+     */
+    public function list_subject(Request $request,  MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $query = $em->createQuery("SELECT sb FROM App\Entity\Subject sb  ORDER BY sb.name ASC");
+        $subjects= $query->getResult();
+        return $this->json($subjects, 200, [], ['groups'=> 'post:read']);                  
+    }
+
+    /**
      * @Route("/api/cours/content/video/{id}", name="api_cours_content_video_list", methods={"GET"})
      */
     public function list_cours_content_video(Request $request, string $id, EntityManagerInterface $em)
@@ -258,9 +268,9 @@ class CustomerController extends AbstractController
 
 
     /**
-     * @Route("/api/register/{email}/{password}/{firstName}/{lastName}/{birthday}/{role}", name="api_register", methods={"GET"})
+     * @Route("/api/register/{email}/{password}/{firstName}/{lastName}/{role}/{tel?}",  defaults={"tel": ""}, name="api_register", methods={"GET"})
      */
-    public function api_register(Request $request, string $email, string $password, string $firstName, string $lastName, string $birthday, string $role,
+    public function api_register(Request $request, string $email, string $password, string $firstName, string $lastName, string $role, string $tel,
                                  EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository)
     {
         if (is_null(array_search($role, Member::getRoleTypesExceptAdmin()))) {
@@ -277,7 +287,8 @@ class CustomerController extends AbstractController
         $member->setPassword($encoder->encodePassword($member, $password));       
         $member->setLastName($firstName);
         $member->setFirstName($lastName);
-        $member->setDateBirth(new DateTime($birthday));
+        $member->setTel($tel);
+        //$member->setDateBirth(new DateTime($birthday));
         $roles[] = $role;
         $member->setRoles($roles);
         $member->setDateRegistration(new DateTime("now"));
@@ -285,6 +296,81 @@ class CustomerController extends AbstractController
         $manager->flush();
 
         return $this->json($member, 200, [], ['groups'=> 'post:read']);                  
+    }
+
+    /**
+     * @Route("/api/register/child/{user_connected}/{login}/{password}/{firstName}/{lastName}/{birthday}/{level}/{type_subscription}/{email?}",  defaults={"email": ""}, name="api_register_child", methods={"GET"})
+     */
+    public function api_register_child(Request $request, string $user_connected, string $login, string $password, string $firstName, string $lastName, string $birthday,  string $level, string $type_subscription,  string $email, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository, LevelRepository $levelRepository,  SubjectRepository $subjectRepository)
+    {
+        
+        $user = $memberRepository->findOneBy(['email' => $email]);
+        if($user != null) {
+            $user->setEmail("already exist");
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);  
+        }
+
+        // save student infos
+        $member = new Member();
+        $member->setEmail($email);
+        $member->setPassword($encoder->encodePassword($member, $password));       
+        $member->setLastName($firstName);
+        $member->setFirstName($lastName);
+        $member->setEmail($email);
+        $member->setDateBirth(new DateTime($birthday));        
+        $member->setDateRegistration(new DateTime("now"));
+        $roles[] = "ROLE_STUDENT";
+        $member->setRoles($roles);
+
+
+        //add susbcription
+        $level = $levelRepository->findOneBy(['name' => $level]);
+        $subscription = new Subscription(); 
+        $subscription->setStudent($member);
+        $subscription->setLevel($level);
+        //$subject = $subjectRepository->findOneBy(['name' => $subject]);
+        //$subscription->addSubject($subject);
+
+        $months = 0;
+        $priceReduction = 0;
+        switch ($type_subscription) {
+            case "Trimestre":
+                $months = 3;
+                $priceReduction = 1;
+                break;
+            case "Semestre":
+                $months = 6;
+                $priceReduction = 0.9;
+                break;
+            case "Année":
+                $months = 12;
+                $priceReduction = 0.8;
+                break;
+        }
+        $startDate = new DateTime();
+        $endDate = new DateTime();
+        $endDate->setTimestamp($startDate->getTimestamp());
+        $endDate->add(DateInterval::createFromDateString("+ " . $months . " months"));
+        $subscription->setDateStart($startDate);
+        $subscription->setDateEnd($endDate);
+        $subscription->setIsActive(true);
+        $totalPrice = $priceReduction * $months * 7;
+        $subscription->setPrice(number_format($totalPrice, "2", ".", ""));
+
+        //associate student to parent
+        $tutor = $memberRepository->find($user_connected);        
+        $kinship = new Kinship();
+        $kinship->setStudent($member);
+        $kinship->setTutor($tutor);
+
+        $em->persist($kinship);
+        $em->persist($subscription);
+        $em->persist($member);
+        $em->flush();
+
+
+        return $this->json($tutor, 200, [], ['groups'=> 'post:read']);  
+
     }
 
 
@@ -498,13 +584,20 @@ class CustomerController extends AbstractController
     /**
      * @Route("/api/tutor/child/delete/{user_child_id}", name="api_tutor_child_delete", methods={"GET"})
      */
-    public function api_tutor_child_delete(Request $request, string $user_child_id, EntityManagerInterface $em, KinshipRepository $kinshipRepository)
+    public function api_tutor_child_delete(Request $request, string $user_child_id, EntityManagerInterface $em, KinshipRepository $kinshipRepository, MemberRepository $memberRepository)
     {
         
-        $kinship = $kinshipRepository->find($user_child_id);; 
+        $kinship = $kinshipRepository->find($user_child_id);
         $em->remove($kinship);
         $em->flush();
+        
+        $student = $memberRepository->find($kinship->getStudent()->getId());
+        //var_dump($student->getFirstName()); die();
+        $student->setIsActive(false);
+        $em->persist($student);
+        $em->flush();
 
+        
         return $this->json($kinship, 200, [], ['groups'=> 'post:read']); 
     }
 

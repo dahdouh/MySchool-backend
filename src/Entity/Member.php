@@ -56,6 +56,12 @@ class Member implements UserInterface
     private $email;
 
     /**
+     * @ORM\Column(type="string", length=180, unique=false, nullable=true)
+     * @Groups("post:read")
+     */
+    private $tel;
+
+    /**
      * @ORM\Column(type="json")
      * @Groups("post:read")
      */
@@ -140,7 +146,7 @@ class Member implements UserInterface
     private $desktopDocuments;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      * @Groups("post:read")
      */
     private $date_birth;
@@ -178,6 +184,18 @@ class Member implements UserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getTel(): ?string
+    {
+        return $this->tel;
+    }
+
+    public function setTel(string $tel): self
+    {
+        $this->tel = $tel;
 
         return $this;
     }
