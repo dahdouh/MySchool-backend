@@ -53,6 +53,12 @@ class Course
     private $description;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("post:read")
+     */
+    private $image;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isValid = null;
@@ -156,6 +162,18 @@ class Course
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

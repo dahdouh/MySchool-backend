@@ -176,6 +176,23 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @Route("/api/subject/cours/{id}/{subject}", name="api_subject_cours_list", methods={"GET"})
+     */
+    public function suject_list_cours_student(Request $request, string $id, string $subject,  MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        //$user = $memberRepository->find($id);
+      //$query = $em->createQuery("SELECT c FROM App\Entity\Course sb JOIN sb.student st JOIN sb.level lv JOIN lv.courses c  WHERE sb.isActive=1 AND st.id=".$id."");
+        $query = $em->createQuery("SELECT c FROM App\Entity\Course c JOIN c.subject subj JOIN c.level lv JOIN lv.subscriptions sb JOIN sb.student st  WHERE sb.isActive=1 AND st.id=".$id." AND subj.id=".$subject."");
+        $users = $query->getResult();
+
+        if($users != null) {
+                return $this->json($users, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            return $this->json([], 200, [], ['groups'=> 'post:read']);
+        }
+    }
+
+    /**
      * @Route("/api/subject/list", name="api_subject_list", methods={"GET"})
      */
     public function list_subject(Request $request,  MemberRepository $memberRepository, EntityManagerInterface $em)
