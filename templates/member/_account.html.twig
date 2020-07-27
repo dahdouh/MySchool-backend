@@ -4,6 +4,7 @@
         <h5>Modifier mes informations</h5>
         <form method="post" action="{{ path('member_information_save_action') }}">
             <div class="row mb-3">
+                {{ form_row(form.image) }}
                 <div class="col">
                     <label for="accountFirstName">Prénom</label>
                     <input type="text" id="accountFirstName"

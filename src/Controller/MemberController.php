@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+use App\Form\MemberType;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 /**
  * @Route("/member")
  */
@@ -93,6 +96,58 @@ class MemberController extends AbstractController
             return $this->redirectToRoute("teacher_account_confirm_identity");
         }
     }
+
+    
+    /**
+     * @Route("/picture/new/{id}", name="profile_picture_new")
+     */
+    /*
+    public function profile_picture(Request $request, String $id, SluggerInterface $slugger, MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $user = $memberRepository->find($id);
+        if($user != null) {
+        
+            $form = $this->createForm(MemberType::class, $user);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $brochureFile = $form->get('image')->getData();
+
+                if ($brochureFile) {
+                    $originalFilename = pathinfo($brochureFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // this is needed to safely include the file name as part of the URL
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$brochureFile->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $brochureFile->move(
+                            $this->getParameter('picture_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                    }
+                    // updates the 'brochureFilename' property to store the PDF file name
+                    // instead of its contents
+                    $user->setImage($newFilename);
+                    $em->persist($user);
+                    $em->flush();
+                }
+                return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+                //return $this->redirect($this->generateUrl('member_verify_identity_action'));
+            }
+        } else {
+            $user->setEmail("not found");
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);
+        }
+        
+
+        return $this->render('member/profileupdate.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+    */
+
 
     /**
      * @Route("/account/information/save", name="member_information_save_action")

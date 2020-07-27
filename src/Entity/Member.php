@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MemberRepository")
@@ -84,6 +85,15 @@ class Member implements UserInterface
      * @Groups("post:read")
      */
     private $lastName;
+
+
+    /**
+     * @ORM\Column(type="string")
+     * @Assert\File(maxSize = "23M",
+     *     mimeTypes = {"image/jpeg", "image/jpg", "image/gif", "image/png"},)
+     * @Groups("post:read")
+     */
+    private $image;
 
     /**
      * @ORM\Column(type="boolean")
@@ -313,6 +323,18 @@ class Member implements UserInterface
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

@@ -35,6 +35,13 @@ use App\Service\CurrentMember;
 use DateTime;
 use DateInterval;
 
+//image
+use App\Form\MemberType;
+use Symfony\Component\String\Slugger\SluggerInterface;
+/*
+use App\Controller\Admin\UploadedBase64File;
+use App\Controller\Admin\Base64FileExtractor;
+*/
 
  
 class CustomerController extends AbstractController
@@ -133,6 +140,128 @@ class CustomerController extends AbstractController
             return $this->json($user, 200, [], ['groups'=> 'post:read']);
         }
     }
+
+    /**
+     * @Route("/api/profile/picture/new/{id}", name="profile_picture_new")
+     */
+
+    public function profile_picture(Request $request, String $id, Base64FileExtractor $base64FileExtractor, SluggerInterface $slugger, MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $user = $memberRepository->find($id);
+        if($user != null) {
+        
+            //$form = $this->createForm(MemberType::class, $user);
+            //$form->handleRequest($request);
+
+            $img = $_POST['image']; // Your data 'data:image/png;base64,AAAFBfj42Pj4';
+            $img = str_replace('data:image/png;base64,', '', $img);
+            $img = str_replace(' ', '+', $img);
+            //$ini =substr($img[0], 11);
+            //$type = explode(';', $ini);
+            $data = base64_decode($img);
+            file_put_contents($this->getParameter('picture_directory').'/image.jpg', $data);
+                    
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+             
+        } else {
+            $user->setEmail("not found");
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);
+        }
+        
+
+       /* return $this->render('member/profileupdate.html.twig', [
+            'form' => $form->createView(),
+        ]);
+        */
+    }
+
+    /*
+    public function uploadimageAction(Request $request, String $id, MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+    	   		
+    	$response = "No hay archivo subido";
+    	
+    	$base = $request->request->get('image');
+    	$filename = $request->request->get('filename');
+    	$propertyId = $request->request->get('id');
+
+    	
+    	if($base != null)
+    	{
+    		$uploadDir = $this->container->getParameter('upload_dir');
+			$uploadSaveDir = $this->container->getParameter('upload_save_dir');
+    		
+    		// Decode Image
+    		$binary=base64_decode($base);
+    		header('Content-Type: bitmap; charset=utf-8');
+    		// Images will be saved under 'www/imgupload/uploads' folder
+    		$file = fopen($this->getParameter('picture_directory').'/'.$filename, 'wb');
+    		// Create File
+    		fwrite($file, $binary);
+    		fclose($file);
+    		$response = "Se ha publicado exitosamente la propiedad.";
+            
+            $user = $memberRepository->find($id);
+            $user->setImage($newFilename);
+            $em->persist($user);
+            $em->flush();
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);
+    		
+    	
+    	}
+    	return $this->json([], 200, [], ['groups'=> 'post:read']);
+    }
+    */
+
+    /*
+    public function profile_picture(Request $request, String $id, SluggerInterface $slugger, MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $user = $memberRepository->find($id);
+        if($user != null) {
+        
+            $form = $this->createForm(MemberType::class, $user);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted()) {
+                $brochureFile = $form->get('image')->getData();
+
+                if ($brochureFile) {
+                    $originalFilename = pathinfo($brochureFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // this is needed to safely include the file name as part of the URL
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$brochureFile->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $brochureFile->move(
+                            $this->getParameter('picture_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                    }
+                    // updates the 'brochureFilename' property to store the PDF file name
+                    // instead of its contents
+                    $user->setImage($newFilename);
+                    $em->persist($user);
+                    $em->flush();
+                    return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+                }
+                return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+            }
+            
+        } else {
+            $user->setEmail("not found");
+            return $this->json($user, 200, [], ['groups'=> 'post:read']);
+        }
+        
+
+        return $this->render('member/profileupdate.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+    */
+
+
 
     /**
      * @Route("/api/profile/update/{email}/{password}/{firstName}/{lastName}/{birthday}", name="api_profile_update", methods={"GET"})
@@ -321,7 +450,7 @@ class CustomerController extends AbstractController
     public function api_register_child(Request $request, string $user_connected, string $login, string $password, string $firstName, string $lastName, string $birthday,  string $level, string $type_subscription,  string $email, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository, LevelRepository $levelRepository,  SubjectRepository $subjectRepository)
     {
         
-        $user = $memberRepository->findOneBy(['email' => $email]);
+        $user = $memberRepository->findOneBy(['email' => $login]);
         if($user != null) {
             $user->setEmail("already exist");
             return $this->json($user, 200, [], ['groups'=> 'post:read']);  

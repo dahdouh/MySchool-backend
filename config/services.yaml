@@ -6,6 +6,7 @@
 parameters:
     subscription_monthlyRate: 0.9
     subscription_subjectPrice: 10
+    picture_directory: '%kernel.project_dir%/public/upload/picture'
 services:
     # default configuration for services in *this* file
     _defaults:
