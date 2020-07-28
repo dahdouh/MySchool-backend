@@ -153,19 +153,25 @@ class CustomerController extends AbstractController
             //$form = $this->createForm(MemberType::class, $user);
             //$form->handleRequest($request);
 
-            $img = $_POST['image']; // Your data 'data:image/png;base64,AAAFBfj42Pj4';
+            $img = $_POST['image']; // data 'data:image/png;base64,AAAFBfj42Pj4';
             $img = str_replace('data:image/png;base64,', '', $img);
             $img = str_replace(' ', '+', $img);
             //$ini =substr($img[0], 11);
             //$type = explode(';', $ini);
             $data = base64_decode($img);
-            file_put_contents($this->getParameter('picture_directory').'/image.jpg', $data);
+            $avatar = $id.'.jpg';
+            file_put_contents($this->getParameter('picture_directory').'/'.$avatar, $data);
+
+            $user = $memberRepository->find($id);
+            $user->setImage($avatar);
+            $em->persist($user);
+            $em->flush();
                     
-            return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
+            return $this->json(true, 200, [], ['groups'=> 'post:read']);                  
              
         } else {
             $user->setEmail("not found");
-            return $this->json($user, 200, [], ['groups'=> 'post:read']);
+            return $this->json(false, 200, [], ['groups'=> 'post:read']);
         }
         
 
