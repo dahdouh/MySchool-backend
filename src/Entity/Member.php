@@ -51,7 +51,7 @@ class Member implements UserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=false)
      * @Groups("post:read")
      */
     private $email;

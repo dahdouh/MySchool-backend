@@ -465,7 +465,8 @@ class CustomerController extends AbstractController
         // save student infos
         $member = new Member();
         $member->setEmail($email);
-        $member->setPassword($encoder->encodePassword($member, $password));       
+        $member->setPassword($encoder->encodePassword($member, $password)); 
+        $member->setImage("default.png");      
         $member->setLastName($firstName);
         $member->setFirstName($lastName);
         $member->setEmail($email);
@@ -503,6 +504,7 @@ class CustomerController extends AbstractController
         $endDate = new DateTime();
         $endDate->setTimestamp($startDate->getTimestamp());
         $endDate->add(DateInterval::createFromDateString("+ " . $months . " months"));
+        $subscription->setType($type_subscription);
         $subscription->setDateStart($startDate);
         $subscription->setDateEnd($endDate);
         $subscription->setIsActive(true);
@@ -539,6 +541,85 @@ class CustomerController extends AbstractController
         return $this->json($subscriptions, 200, [], ['groups'=> 'post:read']);                  
 
      }
+
+     /**
+     * @Route("/api/subscription/student/check/{id}/{subject}", name="api_subscription_student_check", methods={"GET"})
+     */
+    public function parent_child_subscribe_check(Request $request, string $id, string $subject,  MemberRepository $memberRepository, EntityManagerInterface $em)
+    {
+        $query = $em->createQuery("SELECT sb FROM App\Entity\Subscription sb JOIN sb.student st JOIN sb.subjects subj WHERE sb.isActive=1 AND st.id=".$id." AND subj.id=".$subject."");
+        $subscription = $query->getResult();
+
+        if($subscription != null) {
+                return $this->json($subscription, 200, [], ['groups'=> 'post:read']);                  
+        } else {
+            return $this->json([], 200, [], ['groups'=> 'post:read']);
+        }
+    }
+
+    /**
+     * @Route("/api/subscription/parent/student/unsubscribe/{id}/{subject}", name="api_subscription_student_unsubscribe", methods={"GET"})
+     */
+    public function parent_child_subscribe_unsubscribe(Request $request, string $id, string $subject,  MemberRepository $memberRepository, EntityManagerInterface $em, SubjectRepository $subjectRepository)
+    {
+        $query = $em->createQuery("SELECT sb FROM App\Entity\Subscription sb JOIN sb.student st JOIN sb.subjects subj WHERE sb.isActive=1 AND st.id=".$id." AND subj.id=".$subject."");
+        $subscription = $query->getResult();
+        $sub = $subscription[0];
+        $subject = $subjectRepository->find($subject);
+        $sub->setIsActive(false);
+        $em->persist($sub);
+        $em->flush();
+        return $this->json($subscription, 200, [], ['groups'=> 'post:read']);                  
+        
+    }
+
+    /**
+     * @Route("/api/subscription/parent/student/done/{id}/{level}/{type_subscription}/{subject_id}", name="api_subscription_parent_student_done")
+     */
+    public function api_subscription_parent_student_done(Request $request, string $id, string $level, string $type_subscription, string $subject_id, EntityManagerInterface $em, MemberRepository $memberRepository, LevelRepository $levelRepository,  SubscriptionRepository $subscriptionRepository, SubjectRepository $subjectRepository)
+    {
+        
+        $student = $memberRepository->find($id);
+        
+        //add susbcription
+        $level = $levelRepository->findOneBy(['name' => $level]);
+        $subscription = new Subscription(); 
+        $subscription->setStudent($student);
+        $subscription->setLevel($level);
+
+        $months = 0;
+        $priceReduction = 0;
+        switch ($type_subscription) {
+            case "Trimestre":
+                $months = 3;
+                $priceReduction = 1;
+                break;
+            case "Semestre":
+                $months = 6;
+                $priceReduction = 0.9;
+                break;
+            case "Année":
+                $months = 12;
+                $priceReduction = 0.8;
+                break;
+        }
+        $startDate = new DateTime();
+        $endDate = new DateTime();
+        $endDate->setTimestamp($startDate->getTimestamp());
+        $endDate->add(DateInterval::createFromDateString("+ " . $months . " months"));
+        $subscription->setType($type_subscription);
+        $subscription->setDateStart($startDate);
+        $subscription->setDateEnd($endDate);
+        $subscription->setIsActive(true);
+        $totalPrice = $priceReduction * $months * 7;
+        $subscription->setPrice(number_format($totalPrice, "2", ".", ""));
+
+        $subject = $subjectRepository->find($subject_id);  
+        $subscription->addSubject($subject);        
+        $em->persist($subscription);
+        $em->flush();
+        return $this->json($subscription, 200, [], ['groups'=> 'post:read']);  
+    }
 
     /**
      * @Route("/api/subscription/new/{id}/{level}/{subject}/{duration}", name="api_subscription_new")

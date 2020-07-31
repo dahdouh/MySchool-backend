@@ -21,6 +21,12 @@ class Subscription
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     * @Groups("post:read")
+     */
+    private $type;
+     
+    /**
      * @ORM\Column(type="datetime")
      * @Groups("post:read")
      */
@@ -71,6 +77,18 @@ class Subscription
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     public function getDateStart(): ?\DateTimeInterface
