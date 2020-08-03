@@ -9,6 +9,7 @@ use App\Entity\Subject;
 use App\Entity\Member;
 use App\Entity\Subscription;
 use App\Entity\Post;
+use App\Entity\Payment;
 use App\Entity\Kinship;
 use App\Entity\HistoricAction;
 use App\Repository\CourseRepository;
@@ -686,6 +687,27 @@ class CustomerController extends AbstractController
         $manager->flush();
 
         return $this->json($subscription, 200, [], ['groups'=> 'post:read']); 
+     }
+
+     /**
+     * @Route("/api/payment/{id_user}/{owner_name}/{card_number}/{expiration_date}/{crypto}", name="api_payment")
+     */
+    public function api_payment(Request $request, int $id_user, string $owner_name, string $card_number, string $expiration_date, string $crypto, EntityManagerInterface $manager,  
+                    MemberRepository $memberRepository)
+    {
+
+        $payment = new Payment();
+        $user = $memberRepository->find($id_user);
+        $payment->setUser($user);
+        $payment->setOwnerName($owner_name);
+        $payment->setCardNumber($card_number);
+        $payment->setExpirationDate($expiration_date);
+        $payment->setCrypto($crypto);
+        $manager->persist($payment);
+        $manager->flush();
+
+        return $this->json($payment, 200, [], ['groups'=> 'post:read']);                  
+
      }
 
     /**
