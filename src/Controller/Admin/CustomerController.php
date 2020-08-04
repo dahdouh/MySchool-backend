@@ -12,6 +12,7 @@ use App\Entity\Post;
 use App\Entity\Payment;
 use App\Entity\Kinship;
 use App\Entity\HistoricAction;
+use App\Entity\Topic;
 use App\Repository\CourseRepository;
 use App\Repository\LevelRepository;
 use App\Repository\MemberRepository;
@@ -65,8 +66,13 @@ class CustomerController extends AbstractController
         if($user != null) {
             $valid = $this->passwordEncoder->isPasswordValid($user, $password);
             if($valid) {
-                //dd($valid); die();
-                return $this->json($user, 200, [], ['groups'=> 'post:read']);      
+                if($user->getIsActive()) {
+                return $this->json($user, 200, [], ['groups'=> 'post:read']);  
+                } else {
+                    //echo $user->getFirstName(); die();
+                    $user->setEmail("not activated");
+                    return $this->json($user, 200, [], ['groups'=> 'post:read']);
+                }    
             } else {
                 $user->setEmail("not found");
                 return $this->json($user, 200, [], ['groups'=> 'post:read']);  
@@ -477,10 +483,6 @@ class CustomerController extends AbstractController
                     );
             
                     $mailer->send($message);
-        
-
-        
-
         return $this->json($member, 200, [], ['groups'=> 'post:read']);                  
     }
 
@@ -795,7 +797,13 @@ class CustomerController extends AbstractController
         $query = $em->createQuery("SELECT tp FROM App\Entity\Topic tp JOIN tp.forum f JOIN f.level l WHERE l.id in (SELECT lv.id FROM App\Entity\Level lv JOIN lv.subscriptions sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id." GROUP BY lv.id)");
         //$query = $em->createQuery("SELECT his FROM App\Entity\Forum his JOIN his.actor a WHERE a.id=".$id."");
         $topics = $query->getResult();
-        return $this->json($topics[0], 200, [], ['groups'=> 'post:read']);  
+        if(sizeof($topics)>0)
+            return $this->json($topics[0], 200, [], ['groups'=> 'post:read']); 
+        else {
+            $topics =  new Topic();
+            $topics->setTitle("not found");
+            return $this->json($topics, 200, [], ['groups'=> 'post:read']); 
+        }
      }
 
     /**
