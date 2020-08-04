@@ -1,0 +1,12 @@
+{# templates/emails/password.html.twig #}
+<h3> You did it! You registered. </h3>
+
+<h5> Hi {{ name }}! You're successfully registered. </h5>
+<p>
+To activate your account, please go to: <a href="{{ url('api_register_activate',{'email': login}) }}"> <button> Activate </button></a>
+</p>
+
+{# To login, go to: <a href="{{ url('login') }}">...</a>.
+#}
+
+Thanks!

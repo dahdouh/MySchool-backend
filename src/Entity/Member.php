@@ -88,7 +88,7 @@ class Member implements UserInterface
 
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Assert\File(maxSize = "23M",
      *     mimeTypes = {"image/jpeg", "image/jpg", "image/gif", "image/png"},)
      * @Groups("post:read")

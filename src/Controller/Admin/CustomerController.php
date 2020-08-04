@@ -111,14 +111,27 @@ class CustomerController extends AbstractController
                     $user->setPassword($password);                    
                     $em->persist($user);
                     $em->flush();
-
+                    /*
                     $message = (new \Swift_Message('Password reset'))
                     ->setFrom('onlineschool606@gmail.com')
-                    ->setTo($email)
+                    ->setTo("karim.dahdouh.fr@gmail.com")
                     ->setBody("Hi, You have requested a new password. To access the MySchool application, you can use the following coordinates. login : ".$email." and password : ".$plainPassword);
+                    */
+                    $message = (new \Swift_Message('SchoolAx password reset'))
+                    ->setFrom('onlineschool606@gmail.com')
+                    ->setTo($user->getEmail())
+                    ->setBody(
+                        $this->renderView(
+                            // templates/emails/registration.html.twig
+                            'emails/password.html.twig',
+                            ['name' => $user->getFirstName(), 'login' => $user->getEmail(), 'password' => $plainPassword]
+                        ),
+                        'text/html'
+                    );
             
-                $mailer->send($message);
+                    $mailer->send($message);
 
+                
                 $user->setPassword("schoolax");
 
                 return $this->json($user, 200, [], ['groups'=> 'post:read']);                  
@@ -126,6 +139,7 @@ class CustomerController extends AbstractController
             $user->setEmail("not found");
             return $this->json($user, 200, [], ['groups'=> 'post:read']);  
         }
+        
     }
 
     /**
@@ -424,7 +438,7 @@ class CustomerController extends AbstractController
      * @Route("/api/register/{email}/{password}/{firstName}/{lastName}/{role}/{tel?}",  defaults={"tel": ""}, name="api_register", methods={"GET"})
      */
     public function api_register(Request $request, string $email, string $password, string $firstName, string $lastName, string $role, string $tel,
-                                 EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository)
+                                 EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository, \Swift_Mailer $mailer)
     {
         if (is_null(array_search($role, Member::getRoleTypesExceptAdmin()))) {
             throw new Exception("Ce rôle n'est pas disponible.");
@@ -441,6 +455,7 @@ class CustomerController extends AbstractController
         $member->setLastName($firstName);
         $member->setFirstName($lastName);
         $member->setTel($tel);
+        $member->setIsActive(false);
         //$member->setDateBirth(new DateTime($birthday));
         $roles[] = $role;
         $member->setRoles($roles);
@@ -448,7 +463,57 @@ class CustomerController extends AbstractController
         $manager->persist($member);
         $manager->flush();
 
+
+        $message = (new \Swift_Message('SchoolAx activate your account'))
+                    ->setFrom('onlineschool606@gmail.com')
+                    ->setTo($member->getEmail())
+                    ->setBody(
+                        $this->renderView(
+                            // templates/emails/registration.html.twig
+                            'emails/activate.html.twig',
+                            ['name' => $member->getFirstName(), 'login' => $member->getEmail(), 'password' => $password]
+                        ),
+                        'text/html'
+                    );
+            
+                    $mailer->send($message);
+        
+
+        
+
         return $this->json($member, 200, [], ['groups'=> 'post:read']);                  
+    }
+
+    /**
+     * @Route("/api/register/activate/{email}", name="api_register_activate", methods={"GET"})
+     */
+    public function api_register_activate(Request $request, string $email, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, MemberRepository $memberRepository, \Swift_Mailer $mailer)
+    {
+
+        $member = $memberRepository->findOneBy(['email' => $email]);
+        if($member != null) {
+             
+            $member->setIsActive(true);
+            $manager->persist($member);
+            $manager->flush();
+
+            $message = (new \Swift_Message('SchoolAx activate your account'))
+                        ->setFrom('onlineschool606@gmail.com')
+                        ->setTo($member->getEmail())
+                        ->setBody(
+                            $this->renderView(
+                                // templates/emails/registration.html.twig
+                                'emails/activate_done.html.twig',
+                                ['name' => $member->getFirstName(), 'login' => $member->getEmail()]
+                            ),
+                            'text/html'
+                        );
+                
+                        $mailer->send($message);
+            
+
+            return $this->render('emails/activate_done.html.twig', ["name" => $member->getFirstName() ]);    
+        }           
     }
 
     /**
