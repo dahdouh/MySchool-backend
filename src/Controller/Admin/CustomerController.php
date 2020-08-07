@@ -13,6 +13,7 @@ use App\Entity\Payment;
 use App\Entity\Kinship;
 use App\Entity\HistoricAction;
 use App\Entity\Topic;
+use App\Entity\Quiz;
 use App\Repository\CourseRepository;
 use App\Repository\LevelRepository;
 use App\Repository\MemberRepository;
@@ -435,6 +436,9 @@ class CustomerController extends AbstractController
         if($quiz != null) {
                 return $this->json($quiz, 200, [], ['groups'=> 'post:read']);                  
         } else {
+            //$quiz = new Quiz();
+            //$quiz->setName("not found");
+            //return $this->json([0, $quiz], 200, [], ['groups'=> 'post:read']);
             return $this->json(["quiz", "not found"], 200, [], ['groups'=> 'post:read']);
         }
     }
@@ -747,7 +751,7 @@ class CustomerController extends AbstractController
                     MemberRepository $memberRepository, SubscriptionRepository $subscriptionRepository, LevelRepository $levelRepository,  SubjectRepository $subjectRepository)
     {        
 
-        $subscription = $subscriptionRepository->find($id);; 
+        $subscription = $subscriptionRepository->find($id);
         $subscription->setIsActive(false);
     
         $manager->persist($subscription);
@@ -792,18 +796,68 @@ class CustomerController extends AbstractController
      /**
      * @Route("/api/forum/list/{id}", name="api_forum_list")
      */
-    public function api_forum_list(Request $request, int $id, EntityManagerInterface $em, ForumRepository $forumRepository)
+    public function api_forum_list(Request $request, int $id, EntityManagerInterface $em, ForumRepository $forumRepository, MemberRepository $memberRepository)
     {        
-        $query = $em->createQuery("SELECT tp FROM App\Entity\Topic tp JOIN tp.forum f JOIN f.level l WHERE l.id in (SELECT lv.id FROM App\Entity\Level lv JOIN lv.subscriptions sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id." GROUP BY lv.id)");
+        //$query = $em->createQuery("SELECT tp FROM App\Entity\Topic tp JOIN tp.forum f JOIN f.level l WHERE l.id in (SELECT lv.id FROM App\Entity\Level lv JOIN lv.subscriptions sb JOIN sb.student s WHERE sb.isActive=1 AND s.id=".$id." GROUP BY lv.id)");
+        $query = $em->createQuery("SELECT tp FROM App\Entity\Topic tp JOIN tp.subject sb JOIN sb.subscriptions sub JOIN sub.student st WHERE sub.isActive=1 AND st.id=".$id." ORDER BY tp.id DESC");
         //$query = $em->createQuery("SELECT his FROM App\Entity\Forum his JOIN his.actor a WHERE a.id=".$id."");
         $topics = $query->getResult();
-        if(sizeof($topics)>0)
-            return $this->json($topics[0], 200, [], ['groups'=> 'post:read']); 
-        else {
+        //if(sizeof($topics)>0)
+            return $this->json($topics, 200, [], ['groups'=> 'post:read']); 
+        /*else {
             $topics =  new Topic();
             $topics->setTitle("not found");
             return $this->json($topics, 200, [], ['groups'=> 'post:read']); 
         }
+        */
+        
+
+        /*
+        $topics = [];
+        $subjects = [];
+        $filters = [];
+
+        $maxPerPage = 15;
+        $page = 1;
+
+        $currentMember = $memberRepository->find($id);
+
+        $activeSubscription = $currentMember->getSubscriptions()->filter(
+            function (Subscription $subscription) {
+                return $subscription->getIsActive();
+            })->first();
+
+        if ($activeSubscription) {
+            $subjects = $activeSubscription->getSubjects();
+
+            $filters = [
+                "levelId" => $activeSubscription->getLevel()->getId()
+            ];
+
+            foreach ($activeSubscription->getSubjects() as $subject) {
+                $filters["subjects"][] = $subject->getId();
+            }
+            foreach ($activeSubscription->getSubjects() as $subject) {
+                $filters["subjects"][] = $subject->getId();
+                echo $subject->getId();
+            }
+            die();
+
+            $topicRep = $em->getRepository(Topic::class);
+            $topics = $topicRep->findPaginated($page, $maxPerPage, $filters);
+
+            if(sizeof($topics)>0)
+                return $this->json($topics, 200, [], ['groups'=> 'post:read']); 
+            else {
+                $topics =  new Topic();
+                $topics->setTitle("not found");
+                return $this->json($topics, 200, [], ['groups'=> 'post:read']);
+            }
+        }
+        */
+
+        //return $this->json($topics, 200, [], ['groups'=> 'post:read']); 
+
      }
 
     /**
@@ -837,6 +891,32 @@ class CustomerController extends AbstractController
         return $this->json($post, 200, [], ['groups'=> 'post:read']);                  
 
      }
+
+     /**
+     * @Route("/api/forum/topic/add/{id_user}/{user_level}/{subject}/{title}/{content}", name="api_forum_topic_add")
+     */
+    public function api_forum_topic_add(Request $request, int $id_user, string $user_level, string $subject, string $title, string $content, EntityManagerInterface $manager,  
+        MemberRepository $memberRepository, SubjectRepository $subjectRepository, ForumRepository $forumRepository, TopicRepository $topicRepository,  PostRepository $postRepository)
+    {
+
+        $author = $memberRepository->find($id_user);
+        //$topic = $topicRepository->find($id_topic);
+        $subject = $subjectRepository->findOneBy(['name' => $subject]);
+        $forum = $forumRepository->find($user_level);
+        $topic = new Topic();
+        $topic->setAuthor($author);
+        $topic->setSubject($subject);
+        $topic->setForum($forum);
+
+        $topic->setTitle($title);
+        $topic->setContent($content);
+        $topic->setDate(new DateTime("now"));
+        $manager->persist($topic);
+        $manager->flush();
+
+        return $this->json($topic, 200, [], ['groups'=> 'post:read']);                  
+
+    }
 
 
       /*
