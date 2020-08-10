@@ -14,6 +14,7 @@ use App\Entity\Kinship;
 use App\Entity\HistoricAction;
 use App\Entity\Topic;
 use App\Entity\Quiz;
+use App\Entity\DesktopDocument;
 use App\Repository\CourseRepository;
 use App\Repository\LevelRepository;
 use App\Repository\MemberRepository;
@@ -25,6 +26,7 @@ use App\Repository\ForumRepository;
 use App\Repository\PostRepository;
 use App\Repository\TopicRepository;
 use App\Repository\KinshipRepository;
+use App\Repository\DesktopDocumentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -195,6 +197,54 @@ class CustomerController extends AbstractController
             $user->setEmail("not found");
             return $this->json(false, 200, [], ['groups'=> 'post:read']);
         }
+        
+
+       /* return $this->render('member/profileupdate.html.twig', [
+            'form' => $form->createView(),
+        ]);
+        */
+    }
+
+
+    /**
+     * @Route("/api/myspace/upload/file/new/{id}", name="myspace_upload_file")
+     */
+
+    public function myspace_upload_file(Request $request, String $id, Base64FileExtractor $base64FileExtractor, SluggerInterface $slugger, 
+                                        MemberRepository $memberRepository, DesktopDocumentRepository $desktopDocumentRepository, EntityManagerInterface $em)
+    {
+        $user = $memberRepository->find($id);
+        if($user != null) {
+
+
+            
+            $originalImgName= $_FILES['filename']['name'];
+            $extension = explode(".", $originalImgName);
+            $tempName= $_FILES['filename']['tmp_name'];
+            $folder= $this->getParameter('myspace_directory');
+
+            $desktopDocument= new DesktopDocument();
+            $desktopDocument->setName($originalImgName);
+            $desktopDocument->setStudent($user);
+            $em->persist($desktopDocument);
+            $em->flush();
+            //$url = "http://10.113.187.47/".$this->getParameter('picture_directory')."/".$originalImgName; //update path as per your directory structure 
+            
+            if(move_uploaded_file($tempName,$folder."/".$id."/desktopDocument/".$desktopDocument->getId().".".$extension[1])){
+                
+                return $this->json(["message"=> "yes"], 200, [], ['groups'=> 'post:read']);                  
+            }else{
+                return $this->json(["message"=> "no"], 200, [], ['groups'=> 'post:read']);
+            } 
+        } else {
+            $user->setEmail("not found");
+            return $this->json(false, 200, [], ['groups'=> 'post:read']);
+        }  
+            
+
+
+
+        
         
 
        /* return $this->render('member/profileupdate.html.twig', [
