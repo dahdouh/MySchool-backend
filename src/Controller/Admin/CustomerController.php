@@ -389,7 +389,7 @@ class CustomerController extends AbstractController
     {
         //$user = $memberRepository->find($id);
       //$query = $em->createQuery("SELECT c FROM App\Entity\Course sb JOIN sb.student st JOIN sb.level lv JOIN lv.courses c  WHERE sb.isActive=1 AND st.id=".$id."");
-        $query = $em->createQuery("SELECT c FROM App\Entity\Course c JOIN c.subject subj JOIN c.level lv JOIN lv.subscriptions sb JOIN sb.student st  WHERE sb.isActive=1 AND st.id=".$id." AND subj.id=".$subject."");
+        $query = $em->createQuery("SELECT c FROM App\Entity\Course c JOIN c.subject subj JOIN c.level lv JOIN lv.subscriptions sb JOIN sb.student st  WHERE sb.isActive=1 AND c.isValid=1 AND st.id=".$id." AND subj.id=".$subject."");
         $users = $query->getResult();
 
         if($users != null) {
